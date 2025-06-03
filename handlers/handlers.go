@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"fmt"
-	// "strconv"
+	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/auth"
