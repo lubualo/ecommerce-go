@@ -8,6 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/lubualo/ecommerce-go/models"
 	"github.com/lubualo/ecommerce-go/secretm"
+	"github.com/Masterminds/squirrel"
 )
 
 var SecretModel models.SecretRDSJson
@@ -52,4 +53,40 @@ func ConnStr(json models.SecretRDSJson) string {
 	)
 	fmt.Println(dsn)
 	return dsn
+}
+
+func UserIsAdmin(UserUUID string) (bool, string) {
+	fmt.Println("UserIsAdmin process begin")
+	err := DbConnect()
+	if err != nil {
+		return false, err.Error()
+	}
+	defer Db.Close()
+
+	query, args, err := squirrel.Select("1").
+		From("users").
+		Where(squirrel.Eq{"User_UUID": UserUUID, "User_Status": 0}).
+		ToSql()
+	if err != nil {
+		return false, err.Error()
+	}
+	fmt.Println(query)
+	// query = "SELECT 1 FROM users WHERE User_UUID = ? AND User_Status = ?"
+	// args  = [UserUUID, 0]
+
+	rows, err := Db.Query(query, args...)
+	if err != nil {
+		return false, err.Error()
+	}
+	defer rows.Close()
+	
+	var value int
+	if rows.Next() {
+		if err := rows.Scan(&value); err != nil {
+			return false, err.Error()
+		}
+		fmt.Println("UserIsAdmin value:", value)
+		return true, ""
+	}
+	return false, "User is not admin"
 }
