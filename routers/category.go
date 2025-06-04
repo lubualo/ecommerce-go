@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/db"
 	"github.com/lubualo/ecommerce-go/models"
 )
@@ -16,15 +15,15 @@ func InsertCategory(body string, user string) (int, string) {
 		return 400, "Error in received data " + err.Error()
 	}
 	if len(t.CategName) == 0 {
-		return 400, "Category name missing"	
+		return 400, "Category name missing"
 	}
 	if len(t.CategPath) == 0 {
-		return 400, "Category path missing"	
+		return 400, "Category path missing"
 	}
 
 	isAdmin, msg := db.UserIsAdmin(user)
 	if !isAdmin {
-		return 400, msg	
+		return 400, msg
 	}
 
 	result, err := db.InsertCategory(t)
