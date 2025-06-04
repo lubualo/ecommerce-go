@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/ddessilvestri/ecommerce-go/models"
 	"github.com/ddessilvestri/ecommerce-go/secretm"
 	_ "github.com/go-sql-driver/mysql"
@@ -45,4 +46,51 @@ func ConnStr(json models.SecretRDSJson) string {
 		dbUser, authToken, dbEndpoint, dbName)
 	fmt.Println(dsn)
 	return dsn
+}
+
+func UserIsAdmin(userUUID string) (bool, string) {
+	fmt.Println("UserIsAdmin starts")
+
+	err := DbConnect()
+	if err != nil {
+		return false, err.Error()
+	}
+
+	defer Db.Close()
+
+	// sentence := "SELECT 1 FROM users WHERE User_UUID'"+userUUID+"' AND User_Status = 0"
+	// rows, err := Db.Query(sentence)
+
+	sentence, args, err := squirrel.
+		Select("1").
+		From("users").
+		Where(squirrel.Eq{
+			"User_UUID":   userUUID,
+			"User_Status": 0,
+		}).ToSql()
+
+	if err != nil {
+		return false, err.Error()
+	}
+
+	fmt.Println(sentence)
+
+	rows, err := Db.Query(sentence, args...)
+
+	if err != nil {
+		return false, err.Error()
+	}
+	var value int
+
+	defer rows.Close()
+	if rows.Next() {
+		if err := rows.Scan(&value); err != nil {
+			return false, err.Error()
+		}
+		fmt.Println("UserIsAdmin > Successfull execution - value ", value)
+		return true, ""
+	}
+
+	return false, "User is not Admin"
+
 }
