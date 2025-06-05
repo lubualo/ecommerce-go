@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/ddessilvestri/ecommerce-go/auth"
@@ -11,6 +12,7 @@ import (
 
 func Handlers(path string, method string, body string, header map[string]string, request events.APIGatewayV2HTTPRequest) (int, string) {
 	fmt.Println("Processing " + path + " > " + method)
+
 	id := request.PathParameters["id"]
 	idn, _ := strconv.Atoi(id)
 
@@ -20,18 +22,18 @@ func Handlers(path string, method string, body string, header map[string]string,
 		return statusCode, user
 	}
 
-	switch path[0:4] {
-	case "user":
+	switch path {
+	case "/user":
 		return ProcessUser(body, path, method, user, id, request)
-	case "prod":
+	case "/product":
 		return ProcessProducts(body, path, method, user, idn, request)
-	case "stoc":
+	case "/stock":
 		return ProcessStock(body, path, method, user, idn, request)
-	case "addr":
+	case "/address":
 		return ProcessAddress(body, path, method, user, idn, request)
-	case "cate":
+	case "/category":
 		return ProcessCategory(body, path, method, user, idn, request)
-	case "orde":
+	case "/order":
 		return ProcessOrder(body, path, method, user, idn, request)
 
 	}
@@ -40,14 +42,29 @@ func Handlers(path string, method string, body string, header map[string]string,
 
 }
 
-func authValidation(path string, method string, header map[string]string) (bool, int, string) {
+func authValidation(
+	path string,
+	method string,
+	header map[string]string,
+) (bool, int, string) {
+	// Rutas públicas (sin token)
 	if (path == "product" && method == "GET") ||
 		(path == "category" && method == "GET") {
 		return true, 200, ""
 	}
-	token := header["authorization"]
-	if len(token) == 0 {
+
+	rawAuth := header["authorization"]
+	if len(rawAuth) == 0 {
 		return false, 401, "Required Token"
+	}
+
+	var token string
+	// Si viene con "Bearer <espacio>" (minúsculas o mayúsculas), lo cortamos
+	if strings.HasPrefix(strings.ToLower(rawAuth), "bearer ") {
+		token = rawAuth[len("Bearer "):]
+	} else {
+		// No viene con prefijo, asumimos que rawAuth es directamente el token
+		token = rawAuth
 	}
 
 	isOk, msg, err := auth.TokenValidation(token)
@@ -62,8 +79,39 @@ func authValidation(path string, method string, header map[string]string) (bool,
 
 	fmt.Println("Token OK")
 	return true, 200, msg
-
 }
+
+// func authValidation(path string, method string, header map[string]string) (bool, int, string) {
+// 	if (path == "product" && method == "GET") ||
+// 		(path == "category" && method == "GET") {
+// 		return true, 200, ""
+// 	}
+// 	rawAuth := header["authorization"] // e.g. "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…"
+// 	if len(rawAuth) == 0 {
+// 		return false, 401, "Required Token"
+// 	}
+
+// 	// 1) Separar “Bearer” del JWT real
+// 	parts := strings.SplitN(rawAuth, " ", 2)
+// 	if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
+// 		return false, 401, "Invalid Authorization header format"
+// 	}
+// 	token := parts[1] // aquí ya tenemos solo “eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…”
+
+// 	isOk, msg, err := auth.TokenValidation(token)
+// 	if !isOk {
+// 		if err != nil {
+// 			fmt.Println("Token Error " + err.Error())
+// 			return false, 401, err.Error()
+// 		}
+// 		fmt.Println("Token Error " + msg)
+// 		return false, 401, msg
+// 	}
+
+// 	fmt.Println("Token OK")
+// 	return true, 200, msg
+
+// }
 
 func ProcessUser(body string, path string, method string, user string, id string, request events.APIGatewayV2HTTPRequest) (int, string) {
 	return 400, "Invalid Method"

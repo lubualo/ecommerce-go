@@ -16,7 +16,7 @@ func InsertCategory(c models.Category) (int64, error) {
 	}
 	defer Db.Close()
 
-	query, args, err := squirrel.Insert("category").Columns("CategName", "CategPath").Values(c.CategName, c.CategPath).ToSql()
+	query, args, err := squirrel.Insert("category").Columns("Categ_Name", "Categ_Path").Values(c.CategName, c.CategPath).ToSql()
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -25,7 +25,7 @@ func InsertCategory(c models.Category) (int64, error) {
 
 	// var result sql.Result
 	// result, err = Db.Exec(query, args)
-	result, err := Db.Exec(query, args)
+	result, err := Db.Exec(query, args...)
 
 	if err != nil {
 		fmt.Println(err.Error())
