@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Masterminds/squirrel"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/lubualo/ecommerce-go/models"
 	"github.com/lubualo/ecommerce-go/secretm"
-	"github.com/Masterminds/squirrel"
 )
 
 var SecretModel models.SecretRDSJson
@@ -59,34 +59,32 @@ func UserIsAdmin(UserUUID string) (bool, string) {
 	fmt.Println("UserIsAdmin process begin")
 	err := DbConnect()
 	if err != nil {
+		fmt.Println("DB connection failed: " + err.Error())
 		return false, err.Error()
 	}
 	defer Db.Close()
 
 	query, args, err := squirrel.Select("1").
 		From("users").
-		Where(squirrel.Eq{"User_UUID": UserUUID, "User_Status": 0}).
+		Where(squirrel.Eq{"User_UUID": UserUUID, "User_Status": 1}).
 		ToSql()
 	if err != nil {
+		fmt.Println("Query build failed: " + err.Error())
 		return false, err.Error()
 	}
-	fmt.Println(query)
-	// query = "SELECT 1 FROM users WHERE User_UUID = ? AND User_Status = ?"
-	// args  = [UserUUID, 0]
+	fmt.Println("Query: " + query)
 
-	rows, err := Db.Query(query, args...)
-	if err != nil {
-		return false, err.Error()
-	}
-	defer rows.Close()
-	
+	rows := Db.QueryRow(query, args...)
+
 	var value int
-	if rows.Next() {
-		if err := rows.Scan(&value); err != nil {
+	if err := rows.Scan(&value); err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("User not found or inactive: " + err.Error())
 			return false, err.Error()
 		}
-		fmt.Println("UserIsAdmin value:", value)
-		return true, ""
+		fmt.Println("Query execution error: " + err.Error())
+		return false, "Query execution error: " + err.Error()
 	}
-	return false, "User is not admin"
+	fmt.Println("UserIsAdmin value:", value)
+	return true, ""
 }

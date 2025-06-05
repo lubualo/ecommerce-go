@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/auth"
@@ -20,22 +21,34 @@ func Handlers(path string, method string, body string, headers map[string]string
 		return statusCode, user
 	}
 
-	switch path[0:4] {
+	firstSegment := getFirstPathSegment(path)
+	fmt.Println("First path segment: " + firstSegment)
+	switch firstSegment {
 	case "user":
 		return ProcessUser(body, path, method, user, id, request)
-	case "prod":
+	case "product":
 		return ProcessProducts(body, path, method, user, idn, request)
-	case "stoc":
+	case "stock":
 		return ProcessStock(body, path, method, user, idn, request)
-	case "addr":
+	case "address":
 		return ProcessAddress(body, path, method, user, idn, request)
-	case "cate":
+	case "category":
 		return ProcessCategory(body, path, method, user, idn, request)
-	case "orde":
+	case "order":
 		return ProcessOrder(body, path, method, user, idn, request)
 	}
 
-	return 400, "Invalid method"
+	return 400, "Invalid segment: " + firstSegment
+}
+
+func getFirstPathSegment(path string) string {
+	// Remove leading/trailing slashes
+	trimmed := strings.Trim(path, "/")
+	segments := strings.Split(trimmed, "/")
+	if len(segments) > 0 && segments[0] != "" {
+		return segments[0]
+	}
+	return ""
 }
 
 func validateAuthorization(path string, method string, headers map[string]string) (bool, int, string) {
@@ -63,14 +76,14 @@ func ProcessUser(body string, path string, method string, user string, id string
 }
 
 func ProcessProducts(body string, path string, method string, user string, id int, request events.APIGatewayV2HTTPRequest) (int, string) {
-	switch method {
-	case "POST":
-		return routers.InsertCategory(body, user)
-	}
 	return 400, "Invalid method"
 }
 
 func ProcessCategory(body string, path string, method string, user string, id int, request events.APIGatewayV2HTTPRequest) (int, string) {
+	switch method {
+	case "POST":
+		return routers.InsertCategory(body, user)
+	}
 	return 400, "Invalid method"
 }
 

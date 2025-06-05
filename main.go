@@ -32,11 +32,11 @@ func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest)  (*
 	status, message := handlers.Handlers(path, method, body, headers, request)
 
 	responseHeaders := map[string]string {
-		"Content=Type": "application/json",
+		"Content-Type": "application/json",
 	}
 	response = &events.APIGatewayProxyResponse{
 		StatusCode: status,
-		Body: string(message),
+		Body: message,
 		Headers: responseHeaders,
 	}
 

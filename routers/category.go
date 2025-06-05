@@ -2,7 +2,7 @@ package routers
 
 import (
 	"encoding/json"
-	"strconv"
+	"fmt"
 
 	"github.com/lubualo/ecommerce-go/db"
 	"github.com/lubualo/ecommerce-go/models"
@@ -28,7 +28,15 @@ func InsertCategory(body string, user string) (int, string) {
 
 	result, err := db.InsertCategory(t)
 	if err != nil {
-		return 400, "Error while inserting category " + t.CategName + ":" + err.Error()
+		fmt.Println("Error while inserting category " + t.CategName + ": " + err.Error())
+		return 400, "Error while inserting category " + t.CategName + ": " + err.Error()
 	}
-	return 200, "{ CategID: " + strconv.Itoa(int(result)) + " }"
+
+	data := map[string]int64{"Categ_Id": result}
+	jsonString, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("Error while generating JSON response: " + err.Error())
+		return 400, "Error while generating JSON response: " + err.Error()
+	}
+	return 200, string(jsonString)
 }

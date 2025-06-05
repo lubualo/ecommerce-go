@@ -1,7 +1,6 @@
 package db
 
 import (
-	// "database/sql"
 	"fmt"
 
 	"github.com/Masterminds/squirrel"
@@ -23,7 +22,7 @@ func InsertCategory(c models.Category) (int64, error) {
 		fmt.Println(err.Error())
 		return 0, err
 	}
-	result, err := Db.Exec(query, args)
+	result, err := Db.Exec(query, args...)
 	if err != nil {
 		fmt.Println(err.Error())
 		return 0, err
