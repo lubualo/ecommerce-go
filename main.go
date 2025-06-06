@@ -4,10 +4,11 @@ import (
 	"context"
 	"os"
 	"strings"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/awsgo"
 	"github.com/lubualo/ecommerce-go/db"
-	"github.com/lubualo/ecommerce-go/handlers"
+	"github.com/lubualo/ecommerce-go/routers"
 
 	lambda "github.com/aws/aws-lambda-go/lambda"
 )
@@ -29,7 +30,7 @@ func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest)  (*
 	
 	db.ReadSecret()
 
-	status, message := handlers.Handlers(path, method, body, headers, request)
+	status, message := routers.Router(path, method, body, headers, request)
 
 	responseHeaders := map[string]string {
 		"Content-Type": "application/json",
