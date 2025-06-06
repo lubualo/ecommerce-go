@@ -66,7 +66,7 @@ func UserIsAdmin(UserUUID string) (bool, string) {
 
 	query, args, err := squirrel.Select("1").
 		From("users").
-		Where(squirrel.Eq{"User_UUID": UserUUID, "User_Status": 1}).
+		Where(squirrel.Eq{"User_UUID": UserUUID, "User_Status": 0}).
 		ToSql()
 	if err != nil {
 		fmt.Println("Query build failed: " + err.Error())
