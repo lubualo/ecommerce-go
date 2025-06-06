@@ -1,17 +1,23 @@
 package routers
 
 import (
-	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/handlers"
 )
 
 type CategoryRouter struct{}
 
-func (router *CategoryRouter) Route(body string, path string, method string, user string, id string, request events.APIGatewayV2HTTPRequest) (int, string) {
-	switch method {
-	case "POST":
-		return handlers.PostCategory(body, user)
-	default:
-		return 400, "invalid method " + method
-	}
+func (router *CategoryRouter) Get(user string, id string, query map[string]string) (int, string) {
+	return 405, Get + " not implemented"
+}
+
+func (router *CategoryRouter) Post(body string, user string) (int, string) {
+	return handlers.PostCategory(body, user)
+}
+
+func (router *CategoryRouter) Put(body string, user string, id string) (int, string) {
+	return 405, Put + "not implemented"
+}
+
+func (router *CategoryRouter) Delete(user string, id string) (int, string) {
+	return 405, Delete + "not implemented"
 }

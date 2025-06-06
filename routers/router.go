@@ -8,9 +8,13 @@ import (
 	"github.com/lubualo/ecommerce-go/auth"
 )
 
-func Router(path string, method string, body string, headers map[string]string, request events.APIGatewayV2HTTPRequest) (int, string) {
-	fmt.Println("Processing " + path + " > " + method)
+func Router(request events.APIGatewayV2HTTPRequest, urlPrefix string) (int, string) {
+	path := strings.Replace(request.RawPath, urlPrefix, "", -1)
+	method := request.RequestContext.HTTP.Method
+	body := request.Body
+	headers := request.Headers
 	id := request.PathParameters["id"]
+	fmt.Println("Processing " + path + " > " + method)
 
 	isOk, statusCode, user := validateAuthorization(path, method, headers)
 
@@ -23,17 +27,18 @@ func Router(path string, method string, body string, headers map[string]string, 
 	if err != nil {
 		return 400, "unable to create router: " + err.Error()
 	}
-	return entityRouter.Route(body, path, method, user, id, request)
-}
-
-func getFirstPathSegment(path string) string {
-	// Remove leading/trailing slashes
-	trimmed := strings.Trim(path, "/")
-	segments := strings.Split(trimmed, "/")
-	if len(segments) > 0 && segments[0] != "" {
-		return segments[0]
+	switch method {
+		case Get:
+			return entityRouter.Get(user, id, request.QueryStringParameters)
+		case Post:
+			return entityRouter.Post(body, user)
+		case Put:
+			return entityRouter.Put(body, user, id)
+		case Delete:
+			return entityRouter.Delete(user, id)
+		default:
+			return 405, "method not allowed"
 	}
-	return ""
 }
 
 func validateAuthorization(path string, method string, headers map[string]string) (bool, int, string) {
@@ -54,4 +59,14 @@ func validateAuthorization(path string, method string, headers map[string]string
 	}
 	fmt.Println("Token OK")
 	return true, 200, msg
+}
+
+func getFirstPathSegment(path string) string {
+	// Remove leading/trailing slashes
+	trimmed := strings.Trim(path, "/")
+	segments := strings.Split(trimmed, "/")
+	if len(segments) > 0 && segments[0] != "" {
+		return segments[0]
+	}
+	return ""
 }

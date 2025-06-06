@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"os"
-	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/awsgo"
@@ -13,32 +12,25 @@ import (
 	lambda "github.com/aws/aws-lambda-go/lambda"
 )
 
-func main()  {
+func main() {
 	lambda.Start(LambdaExec)
 }
 
-func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest)  (*events.APIGatewayProxyResponse, error) {
+func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse, error) {
 	awsgo.AWSInit()
 	if !IsValid() {
 		panic("Missing param: 'SecretName', 'UserPoolId', 'Region' and 'UrlPrefix' are required")
 	}
 	var response *events.APIGatewayProxyResponse
-	path := strings.Replace(request.RawPath, os.Getenv("UrlPrefix"), "", -1)
-	method := request.RequestContext.HTTP.Method
-	body := request.Body
-	headers := request.Headers
-	
 	db.ReadSecret()
-
-	status, message := routers.Router(path, method, body, headers, request)
-
-	responseHeaders := map[string]string {
+	status, message := routers.Router(request, os.Getenv("UrlPrefix"))
+	responseHeaders := map[string]string{
 		"Content-Type": "application/json",
 	}
 	response = &events.APIGatewayProxyResponse{
 		StatusCode: status,
-		Body: message,
-		Headers: responseHeaders,
+		Body:       message,
+		Headers:    responseHeaders,
 	}
 
 	return response, nil
