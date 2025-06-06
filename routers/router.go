@@ -28,16 +28,16 @@ func Router(request events.APIGatewayV2HTTPRequest, urlPrefix string) (int, stri
 		return 400, "unable to create router: " + err.Error()
 	}
 	switch method {
-		case Get:
-			return entityRouter.Get(user, id, request.QueryStringParameters)
-		case Post:
-			return entityRouter.Post(body, user)
-		case Put:
-			return entityRouter.Put(body, user, id)
-		case Delete:
-			return entityRouter.Delete(user, id)
-		default:
-			return 405, "method not allowed"
+	case Get:
+		return entityRouter.Get(user, id, request.QueryStringParameters)
+	case Post:
+		return entityRouter.Post(body, user)
+	case Put:
+		return entityRouter.Put(body, user, id)
+	case Delete:
+		return entityRouter.Delete(user, id)
+	default:
+		return 405, "method not allowed"
 	}
 }
 
