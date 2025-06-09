@@ -21,19 +21,10 @@ func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*e
 	if !IsValid() {
 		panic("Missing param: 'SecretName', 'UserPoolId', 'Region' and 'UrlPrefix' are required")
 	}
-	var response *events.APIGatewayProxyResponse
-	db.ReadSecret()
-	status, message := routers.Router(request, os.Getenv("UrlPrefix"))
-	responseHeaders := map[string]string{
-		"Content-Type": "application/json",
-	}
-	response = &events.APIGatewayProxyResponse{
-		StatusCode: status,
-		Body:       message,
-		Headers:    responseHeaders,
-	}
-
-	return response, nil
+	// Repository
+	// db.ReadSecret()
+	httpResponse := routers.Router(request, os.Getenv("UrlPrefix"))
+	return httpResponse, nil
 }
 
 func IsValid() bool {

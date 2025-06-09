@@ -5,60 +5,46 @@ import (
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/lubualo/ecommerce-go/auth"
+	"github.com/lubualo/ecommerce-go/handlers"
 )
 
-func Router(request events.APIGatewayV2HTTPRequest, urlPrefix string) (int, string) {
+func Router(request events.APIGatewayV2HTTPRequest, urlPrefix string) (*events.APIGatewayProxyResponse) {
 	path := strings.Replace(request.RawPath, urlPrefix, "", -1)
 	method := request.RequestContext.HTTP.Method
-	body := request.Body
-	headers := request.Headers
-	id := request.PathParameters["id"]
 	fmt.Println("Processing " + path + " > " + method)
-
-	isOk, statusCode, user := validateAuthorization(path, method, headers)
-
-	if !isOk {
-		return statusCode, user
-	}
-
 	firstSegment := getFirstPathSegment(path)
-	entityRouter, err := CreateRouter(firstSegment)
-	if err != nil {
-		return 400, "unable to create router: " + err.Error()
-	}
+
+	entityHandler, _ := handlers.CreateHandler(firstSegment)
 	switch method {
 	case Get:
-		return entityRouter.Get(user, id, request.QueryStringParameters)
+		return entityHandler.Get(request)
 	case Post:
-		return entityRouter.Post(body, user)
+		return entityHandler.Post(request)
 	case Put:
-		return entityRouter.Put(body, user, id)
+		return entityHandler.Put(request)
 	case Delete:
-		return entityRouter.Delete(user, id)
-	default:
-		return 405, "method not allowed"
-	}
-}
-
-func validateAuthorization(path string, method string, headers map[string]string) (bool, int, string) {
-	if (path == "product" && method == "GET") || (path == "category" && method == "GET") {
-		return true, 200, ""
+		return entityHandler.Delete(request)
 	}
 
-	token := headers["authorization"]
-	if len(token) == 0 {
-		return false, 401, "Token required"
-	}
 
-	isOk, msg, _ := auth.ValidateToken(token)
 
-	if !isOk {
-		fmt.Println("Error in token: " + msg)
-		return false, 401, msg
-	}
-	fmt.Println("Token OK")
-	return true, 200, msg
+	// firstSegment := getFirstPathSegment(path)
+	// entityRouter, err := CreateRouter(firstSegment)
+	// if err != nil {
+	// 	return 400, "unable to create router: " + err.Error()
+	// }
+	// switch method {
+	// case Get:
+	// 	return entityRouter.Get(request)
+	// case Post:
+	// 	return entityRouter.Post(request)
+	// case Put:
+	// 	return entityRouter.Put(request)
+	// case Delete:
+	// 	return entityRouter.Delete(request)
+	// default:
+	// 	return 405, "method not allowed"
+	// }
 }
 
 func getFirstPathSegment(path string) string {

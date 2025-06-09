@@ -1,4 +1,5 @@
-package routers
+package handlers
+
 
 import (
 	"fmt"
@@ -6,7 +7,7 @@ import (
 	"github.com/lubualo/ecommerce-go/common"
 )
 
-func CreateRouter(entity string) (EntityRouter, error) {
+func CreateHandler(entity string) (EntityHandler, error) {
 	switch entity {
 	case common.User:
 		return nil, fmt.Errorf("invalid entity: %s", entity)
@@ -17,7 +18,7 @@ func CreateRouter(entity string) (EntityRouter, error) {
 	case common.Address:
 		return nil, fmt.Errorf("invalid entity: %s", entity)
 	case common.Category:
-		return &CategoryRouter{}, nil
+		return &CategoryHandler{}, nil
 	case common.Order:
 		return nil, fmt.Errorf("invalid entity: %s", entity)
 	default:

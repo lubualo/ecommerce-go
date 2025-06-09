@@ -1,0 +1,10 @@
+package handlers
+
+import "github.com/aws/aws-lambda-go/events"
+
+type EntityHandler interface {
+	Get(request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse)
+	Post(request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse)
+	Put(request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse)
+	Delete(request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse)
+}
