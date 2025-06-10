@@ -3,25 +3,17 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"os"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/ddessilvestri/ecommerce-go/models"
-	"github.com/ddessilvestri/ecommerce-go/secretm"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var SecretModel models.SecretRDSJson
-var err error
-var Db *sql.DB
+// Builds and returns a new DB connection based on the given secret
+func DbConnectWithSecret(secret models.SecretRDSJson) (*sql.DB, error) {
+	connStr := ConnStr(secret)
 
-func ReadSecret() error {
-	SecretModel, err = secretm.GetSecret(os.Getenv("SecretName"))
-	return err
-}
-
-func DbConnectAndReturn() (*sql.DB, error) {
-	db, err := sql.Open("mysql", ConnStr(SecretModel))
+	db, err := sql.Open("mysql", connStr)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
@@ -33,42 +25,23 @@ func DbConnectAndReturn() (*sql.DB, error) {
 		return nil, err
 	}
 
-	fmt.Println("Successfully database connection")
+	fmt.Println("Successfully connected to database")
 	return db, nil
 }
 
-func DbConnect() error {
-	Db, err = sql.Open("mysql", ConnStr(SecretModel))
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	err = Db.Ping()
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-
-	fmt.Println("Successfully database connection")
-	return nil
-}
-
+// Builds a MySQL connection string
 func ConnStr(json models.SecretRDSJson) string {
-	var dbUser, authToken, dbEndpoint, dbName string
-	dbUser = json.Username
-	authToken = json.Password
-	dbEndpoint = json.Host
-	dbName = "gambit"
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?allowCleartextPasswords=true",
-		dbUser, authToken, dbEndpoint, dbName)
-	fmt.Println(dsn)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/gambit?allowCleartextPasswords=true",
+		json.Username, json.Password, json.Host)
+	fmt.Println("DSN:", dsn)
 	return dsn
 }
 
+// Verifies if a user is admin
 func UserIsAdmin(db *sql.DB, userUUID string) (bool, string) {
-	fmt.Println("UserIsAdmin starts")
+	fmt.Println("Checking if user is admin:", userUUID)
 
-	sentence, args, err := squirrel.
+	query, args, err := squirrel.
 		Select("1").
 		From("users").
 		Where(squirrel.Eq{
@@ -80,67 +53,20 @@ func UserIsAdmin(db *sql.DB, userUUID string) (bool, string) {
 		return false, err.Error()
 	}
 
-	rows, err := db.Query(sentence, args...)
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		return false, err.Error()
 	}
 	defer rows.Close()
 
-	var value int
+	var result int
 	if rows.Next() {
-		if err := rows.Scan(&value); err != nil {
+		if err := rows.Scan(&result); err != nil {
 			return false, err.Error()
 		}
-		fmt.Println("UserIsAdmin > Successfull execution - value ", value)
+		fmt.Println("User is admin")
 		return true, ""
 	}
 
 	return false, "User is not Admin"
 }
-
-// func UserIsAdmin(userUUID string) (bool, string) {
-// 	fmt.Println("UserIsAdmin starts")
-
-// 	err := DbConnect()
-// 	if err != nil {
-// 		return false, err.Error()
-// 	}
-
-// 	defer Db.Close()
-
-// 	// sentence := "SELECT 1 FROM users WHERE User_UUID'"+userUUID+"' AND User_Status = 0"
-// 	// rows, err := Db.Query(sentence)
-
-// 	sentence, args, err := squirrel.
-// 		Select("1").
-// 		From("users").
-// 		Where(squirrel.Eq{
-// 			"User_UUID":   userUUID,
-// 			"User_Status": 0,
-// 		}).ToSql()
-
-// 	if err != nil {
-// 		return false, err.Error()
-// 	}
-
-// 	fmt.Println(sentence)
-
-// 	rows, err := Db.Query(sentence, args...)
-
-// 	if err != nil {
-// 		return false, err.Error()
-// 	}
-// 	var value int
-
-// 	defer rows.Close()
-// 	if rows.Next() {
-// 		if err := rows.Scan(&value); err != nil {
-// 			return false, err.Error()
-// 		}
-// 		fmt.Println("UserIsAdmin > Successfull execution - value ", value)
-// 		return true, ""
-// 	}
-
-// 	return false, "User is not Admin"
-
-// }

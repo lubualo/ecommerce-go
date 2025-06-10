@@ -2,21 +2,22 @@ package main
 
 import (
 	"context"
-
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+
 	"github.com/ddessilvestri/ecommerce-go/awsgo"
 	"github.com/ddessilvestri/ecommerce-go/db"
 	"github.com/ddessilvestri/ecommerce-go/internal/config"
 	"github.com/ddessilvestri/ecommerce-go/routers"
-
-	lambda "github.com/aws/aws-lambda-go/lambda"
+	"github.com/ddessilvestri/ecommerce-go/secretm"
 )
 
 func main() {
 	lambda.Start(LambdaExec)
 }
+
 func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse, error) {
 	// Initialize AWS SDK
 	awsgo.AWSInit()
@@ -26,8 +27,9 @@ func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*e
 		panic("Environment validation error: " + err.Error())
 	}
 
-	// Read secrets from AWS Secrets Manager
-	err := db.ReadSecret()
+	// Load secrets from AWS Secrets Manager
+	secretName := os.Getenv("SecretName")
+	secret, err := secretm.GetSecret(secretName)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -35,8 +37,8 @@ func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*e
 		}, nil
 	}
 
-	// Establish a database connection
-	sqlDB, err := db.DbConnectAndReturn()
+	// Establish database connection using the retrieved secret
+	sqlDB, err := db.DbConnectWithSecret(secret)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -45,8 +47,9 @@ func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*e
 	}
 	defer sqlDB.Close()
 
-	// Call the new router with dependencies injected
-	response := routers.Router(request, os.Getenv("UrlPrefix"), sqlDB)
+	// Call the central router
+	urlPrefix := os.Getenv("UrlPrefix")
+	response := routers.Router(request, urlPrefix, sqlDB)
 
 	return response, nil
 }
