@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -19,17 +18,15 @@ func main() {
 }
 
 func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse, error) {
-	// Initialize AWS SDK
 	awsgo.AWSInit()
 
-	// Check required environment variables
-	if err := config.ValidateEnvVars("SecretName", "UrlPrefix"); err != nil {
-		panic("Environment validation error: " + err.Error())
+	conf, err := config.LoadConfig()
+	if err != nil {
+		panic("Config load failed: " + err.Error())
 	}
 
-	// Load secrets from AWS Secrets Manager
-	secretName := os.Getenv("SecretName")
-	secret, err := secretm.GetSecret(secretName)
+	// Read secrets
+	secret, err := secretm.GetSecret(conf.SecretName)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -37,8 +34,8 @@ func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*e
 		}, nil
 	}
 
-	// Establish database connection using the retrieved secret
-	sqlDB, err := db.DbConnectWithSecret(secret)
+	// Connect to DB using secret + config
+	sqlDB, err := db.DbConnectAndReturn(secret, conf.DBName)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -47,9 +44,8 @@ func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*e
 	}
 	defer sqlDB.Close()
 
-	// Call the central router
-	urlPrefix := os.Getenv("UrlPrefix")
-	response := routers.Router(request, urlPrefix, sqlDB)
+	// Route
+	response := routers.Router(request, conf.UrlPrefix, sqlDB)
 
 	return response, nil
 }

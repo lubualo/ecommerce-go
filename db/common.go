@@ -10,10 +10,8 @@ import (
 )
 
 // Builds and returns a new DB connection based on the given secret
-func DbConnectWithSecret(secret models.SecretRDSJson) (*sql.DB, error) {
-	connStr := ConnStr(secret)
-
-	db, err := sql.Open("mysql", connStr)
+func DbConnectAndReturn(secret models.SecretRDSJson, dbName string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", ConnStr(secret, dbName))
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
@@ -25,15 +23,19 @@ func DbConnectWithSecret(secret models.SecretRDSJson) (*sql.DB, error) {
 		return nil, err
 	}
 
-	fmt.Println("Successfully connected to database")
+	fmt.Println("Successfully database connection")
 	return db, nil
 }
 
 // Builds a MySQL connection string
-func ConnStr(json models.SecretRDSJson) string {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/gambit?allowCleartextPasswords=true",
-		json.Username, json.Password, json.Host)
-	fmt.Println("DSN:", dsn)
+func ConnStr(json models.SecretRDSJson, dbName string) string {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?allowCleartextPasswords=true",
+		json.Username,
+		json.Password,
+		json.Host,
+		dbName,
+	)
+	fmt.Println(dsn)
 	return dsn
 }
 
