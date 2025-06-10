@@ -2,14 +2,14 @@ package main
 
 import (
 	"context"
-	"strings"
 
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/ddessilvestri/ecommerce-go/awsgo"
 	"github.com/ddessilvestri/ecommerce-go/db"
-	"github.com/ddessilvestri/ecommerce-go/handlers"
+	"github.com/ddessilvestri/ecommerce-go/internal/config"
+	"github.com/ddessilvestri/ecommerce-go/routers"
 
 	lambda "github.com/aws/aws-lambda-go/lambda"
 )
@@ -17,42 +17,36 @@ import (
 func main() {
 	lambda.Start(LambdaExec)
 }
-
 func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse, error) {
+	// Initialize AWS SDK
 	awsgo.AWSInit()
-	if !isValid() {
-		panic("Paramater Error. Must send 'SecretName','UrlPrefix'")
-	}
-	var res *events.APIGatewayProxyResponse
-	path := strings.Replace(request.RawPath, os.Getenv("UrlPrefix"), "", -1)
-	method := request.RequestContext.HTTP.Method
-	body := request.Body
-	header := request.Headers
 
-	db.ReadSecret()
-
-	//
-	status, message := handlers.Handlers(path, method, body, header, request)
-
-	headerResp := map[string]string{
-		"Content-Type": "application/json",
+	// Check required environment variables
+	if err := config.ValidateEnvVars("SecretName", "UrlPrefix"); err != nil {
+		panic("Environment validation error: " + err.Error())
 	}
 
-	res = &events.APIGatewayProxyResponse{
-		StatusCode: status,
-		Body:       string(message),
-		Headers:    headerResp,
-	}
-	return res, nil
-
-}
-
-func isValid() bool {
-	_, hasParam := os.LookupEnv("SecretName")
-	if !hasParam {
-		return hasParam
+	// Read secrets from AWS Secrets Manager
+	err := db.ReadSecret()
+	if err != nil {
+		return &events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Failed to read secret: " + err.Error(),
+		}, nil
 	}
 
-	_, hasParam = os.LookupEnv("UrlPrefix")
-	return hasParam
+	// Establish a database connection
+	sqlDB, err := db.DbConnectAndReturn()
+	if err != nil {
+		return &events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Database connection error: " + err.Error(),
+		}, nil
+	}
+	defer sqlDB.Close()
+
+	// Call the new router with dependencies injected
+	response := routers.Router(request, os.Getenv("UrlPrefix"), sqlDB)
+
+	return response, nil
 }
