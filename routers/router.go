@@ -3,14 +3,15 @@ package routers
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/auth"
 	"github.com/lubualo/ecommerce-go/internal/category"
+	"github.com/lubualo/ecommerce-go/tools"
 )
 
-// HTTP method constants
 const (
 	GET    = "GET"
 	POST   = "POST"
@@ -18,26 +19,18 @@ const (
 	DELETE = "DELETE"
 )
 
-// Router determines which entity router should handle the request.
 func Router(request events.APIGatewayV2HTTPRequest, urlPrefix string, db *sql.DB) *events.APIGatewayProxyResponse {
-	// Extract path & method
 	path := strings.Replace(request.RawPath, urlPrefix, "", 1)
 	method := request.RequestContext.HTTP.Method
-	id := request.PathParameters["id"]
-	body := request.Body
 	header := request.Headers
-	query := request.QueryStringParameters
 
-	// Extract main segment (e.g. /category/123 => category)
 	firstSegment := getFirstPathSegment(path)
 
-	// Find the corresponding entity router (e.g., category.Router)
 	entityRouter, err := CreateRouter(firstSegment, db)
 	if err != nil {
-		return jsonResponse(400, "Unable to route request: "+err.Error())
+		return tools.CreateApiResponse(http.StatusBadRequest, "Unable to route request: " + err.Error())
 	}
 
-	// Authenticate
 	isOk, statusCode, user := auth.AuthValidation(path, method, header)
 	if !isOk {
 		return &events.APIGatewayProxyResponse{
@@ -46,22 +39,20 @@ func Router(request events.APIGatewayV2HTTPRequest, urlPrefix string, db *sql.DB
 		}
 	}
 
-	// Route to correct handler based on HTTP method
 	switch method {
 	case GET:
-		return entityRouter.Get(user, id, query)
+		return entityRouter.Get(request)
 	case POST:
-		return entityRouter.Post(body, user)
+		return entityRouter.Post(request)
 	case PUT:
-		return entityRouter.Put(body, user, id)
+		return entityRouter.Put(request)
 	case DELETE:
-		return entityRouter.Delete(user, id)
+		return entityRouter.Delete(request)
 	default:
-		return jsonResponse(405, "Method not allowed")
+		return tools.CreateApiResponse(http.StatusMethodNotAllowed, "Method not allowed")
 	}
 }
 
-// CreateRouter maps entity names to their router implementations
 func CreateRouter(entity string, db *sql.DB) (EntityRouter, error) {
 	switch entity {
 	case "category":
@@ -73,7 +64,6 @@ func CreateRouter(entity string, db *sql.DB) (EntityRouter, error) {
 	}
 }
 
-// Extract first part of path: "/category/1" -> "category"
 func getFirstPathSegment(path string) string {
 	path = strings.Trim(path, "/")
 	parts := strings.Split(path, "/")
