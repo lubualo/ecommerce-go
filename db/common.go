@@ -3,13 +3,13 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/lubualo/ecommerce-go/models"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/lubualo/ecommerce-go/models"
 )
 
-// Builds and returns a new DB connection based on the given secret
 func DbConnectAndReturn(secret models.SecretRDSJson, dbName string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", ConnStr(secret, dbName))
 	if err != nil {
@@ -27,7 +27,6 @@ func DbConnectAndReturn(secret models.SecretRDSJson, dbName string) (*sql.DB, er
 	return db, nil
 }
 
-// Builds a MySQL connection string
 func ConnStr(json models.SecretRDSJson, dbName string) string {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?allowCleartextPasswords=true",
 		json.Username,
@@ -39,7 +38,6 @@ func ConnStr(json models.SecretRDSJson, dbName string) string {
 	return dsn
 }
 
-// Verifies if a user is admin
 func UserIsAdmin(db *sql.DB, userUUID string) (bool, string) {
 	fmt.Println("Checking if user is admin:", userUUID)
 
@@ -71,4 +69,10 @@ func UserIsAdmin(db *sql.DB, userUUID string) (bool, string) {
 	}
 
 	return false, "User is not Admin"
+}
+
+func EscapeString(s string) string {
+	escaped := strings.ReplaceAll(s, "'", "")
+	escaped = strings.ReplaceAll(escaped, "\"", "")
+	return escaped
 }

@@ -25,7 +25,6 @@ func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*e
 		panic("Config load failed: " + err.Error())
 	}
 
-	// Read secrets
 	secret, err := secretm.GetSecret(conf.SecretName)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
@@ -34,7 +33,6 @@ func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*e
 		}, nil
 	}
 
-	// Connect to DB using secret + config
 	sqlDB, err := db.DbConnectAndReturn(secret, conf.DBName)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
@@ -44,8 +42,6 @@ func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*e
 	}
 	defer sqlDB.Close()
 
-	// Route
 	response := routers.Router(request, conf.UrlPrefix, sqlDB)
-
 	return response, nil
 }

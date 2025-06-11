@@ -6,26 +6,32 @@ import (
 	"github.com/lubualo/ecommerce-go/models"
 )
 
-// Service provides methods for business logic related to category.
 type Service struct {
-	repo Storage // This is the interface, so it's decoupled from repositorySQL
+	repo Storage
 }
 
-// NewCategoryService acts like a constructor.
 func NewCategoryService(repo Storage) *Service {
 	return &Service{repo: repo}
 }
 
-// CreateCategory performs validation and delegates to the repository.
 func (s *Service) CreateCategory(c models.Category) (int64, error) {
-	// Simple validation (can be more elaborate in real use cases)
 	if c.CategName == "" || c.CategPath == "" {
-		return 0, ErrInvalidCategory
+		return 0, ErrMissingNameOrPath
 	}
 
-	// Business logic: could include auditing, formatting, etc.
 	return s.repo.InsertCategory(c)
 }
 
-// ErrInvalidCategory represents a validation error.
-var ErrInvalidCategory = errors.New("invalid category: name and path are required")
+func (s *Service) UpdateCategory(c models.Category) (error) {
+	if c.CategName == "" || c.CategPath == "" {
+		return ErrMissingNameOrPath
+	}
+	if c.CategID < 1 {
+		return ErrInvalidId
+	}
+
+	return s.repo.UpdateCategory(c)
+}
+
+var ErrMissingNameOrPath = errors.New("invalid category: name and path are required")
+var ErrInvalidId = errors.New("invalid category id")
