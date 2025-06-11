@@ -34,12 +34,12 @@ func (r *repositorySQL) InsertCategory(c models.Category) (int64, error) {
 	return result.LastInsertId()
 }
 
-func (r *repositorySQL) UpdateCategory(c models.Category) (error) {
+func (r *repositorySQL) UpdateCategory(c models.Category) error {
 	query, args, err := squirrel.
 		Update("category").
 		Set("Categ_Name", c.CategName).
-		Set("CategPath", c.CategPath).
-		Where(squirrel.Eq{"Categ_Path": c.CategID}).
+		Set("Categ_Path", c.CategPath).
+		Where(squirrel.Eq{"Categ_Id": c.CategID}).
 		ToSql()
 	if err != nil {
 		return err

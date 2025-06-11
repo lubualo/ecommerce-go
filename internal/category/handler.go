@@ -26,12 +26,12 @@ func (h *Handler) Post(request events.APIGatewayV2HTTPRequest) (*events.APIGatew
 
 	err := json.Unmarshal([]byte(body), &c)
 	if err != nil {
-		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid JSON body: " + err.Error()), nil
+		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid JSON body: "+err.Error()), nil
 	}
 
 	id, err := h.service.CreateCategory(c)
 	if err != nil {
-		return tools.CreateApiResponse(http.StatusBadRequest, "Error: " + err.Error()), nil
+		return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error()), nil
 	}
 
 	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf(`{"CategID": %d}`, id)), nil
@@ -39,24 +39,24 @@ func (h *Handler) Post(request events.APIGatewayV2HTTPRequest) (*events.APIGatew
 
 func (h *Handler) Put(request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse, error) {
 	body := request.Body
-	
+
 	var c models.Category
 
 	err := json.Unmarshal([]byte(body), &c)
 	if err != nil {
-		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid JSON body: " + err.Error()), nil
+		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid JSON body: "+err.Error()), nil
 	}
 
 	id, err := strconv.Atoi(request.PathParameters["id"])
 	if err != nil {
-		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid ID: " + err.Error()), nil
+		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid ID: "+err.Error()), nil
 	}
 
 	c.CategID = id
 	err = h.service.UpdateCategory(c)
 	if err != nil {
-		return tools.CreateApiResponse(http.StatusBadRequest, "Error: " + err.Error()), nil
+		return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error()), nil
 	}
 
-	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf(`{"CategID": %d}`, id)), nil
+	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf("Category updated: %d", id)), nil
 }
