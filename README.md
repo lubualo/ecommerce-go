@@ -159,3 +159,60 @@ func main() {
 	updateName(&user) // Pass address to modify original value
 }
 ```
+
+## 🧱 Design Patterns in Use
+
+This project follows a **Clean Architecture** approach and implements several key design patterns to ensure maintainability, testability, and scalability.
+
+### ✅ Patterns Currently Applied
+
+| Pattern                 | Purpose                                                                 | Implementation Example                                              |
+|-------------------------|-------------------------------------------------------------------------|----------------------------------------------------------------------|
+| **Repository Pattern**   | Abstracts data access to support multiple storage backends              | [`category/repository_sql.go`](./internal/category/repository_sql.go) implements `Storage` interface |
+| **Factory Pattern**      | Standardized way to construct components (similar to constructors)      | `NewSQLRepository`, `NewCategoryService`, `NewCategoryHandler`      |
+| **Dependency Injection** | Injects dependencies from higher layers to lower layers, improves testing | Passed from `main.go → router → handler → service`                  |
+| **Pointer Injection**    | Go idiomatic way to share resources like `*sql.DB` without copying      | Used across `repository`, `service`, `handler` layers               |
+
+---
+
+### ✨ Example: Repository Pattern
+
+```go
+type Storage interface {
+    InsertCategory(c models.Category) (int64, error)
+}
+
+type repositorySQL struct {
+    db *sql.DB
+}
+
+func NewSQLRepository(db *sql.DB) Storage {
+    return &repositorySQL{db: db}
+}
+```
+
+This design allows you to swap `repositorySQL` with a `MongoRepository` or `MockRepository` without changing the business logic that depends on the interface.
+
+---
+
+### 🔜 Coming Next: Middleware Pattern
+
+We plan to introduce the **Middleware Pattern** to centralize and simplify cross-cutting concerns such as:
+
+- ✅ JWT Token validation
+- ✅ Admin access checks (`UserIsAdmin`)
+- 🧪 Future logging, panic recovery, etc.
+
+This will ensure cleaner and reusable handler logic.
+
+#### 💡 Planned Branch
+
+```
+feature/add-middleware-auth
+```
+
+The goal is to enable middleware chaining that wraps handlers like:
+
+```go
+handlerWithMiddleware := middleware.Authenticate(UserIsAdmin)(handler.Post)
+```
