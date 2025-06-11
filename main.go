@@ -6,11 +6,11 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 
-	"github.com/ddessilvestri/ecommerce-go/awsgo"
-	"github.com/ddessilvestri/ecommerce-go/db"
-	"github.com/ddessilvestri/ecommerce-go/internal/config"
-	"github.com/ddessilvestri/ecommerce-go/routers"
-	"github.com/ddessilvestri/ecommerce-go/secretm"
+	"github.com/lubualo/ecommerce-go/awsgo"
+	"github.com/lubualo/ecommerce-go/db"
+	"github.com/lubualo/ecommerce-go/internal/config"
+	"github.com/lubualo/ecommerce-go/routers"
+	"github.com/lubualo/ecommerce-go/secretm"
 )
 
 func main() {

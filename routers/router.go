@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/ddessilvestri/ecommerce-go/auth"
-	"github.com/ddessilvestri/ecommerce-go/internal/category"
+	"github.com/lubualo/ecommerce-go/auth"
+	"github.com/lubualo/ecommerce-go/internal/category"
 )
 
 // HTTP method constants

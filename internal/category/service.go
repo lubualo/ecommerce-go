@@ -3,7 +3,7 @@ package category
 import (
 	"errors"
 
-	"github.com/ddessilvestri/ecommerce-go/models"
+	"github.com/lubualo/ecommerce-go/models"
 )
 
 // Service provides methods for business logic related to category.

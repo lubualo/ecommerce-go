@@ -7,8 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 
-	"github.com/ddessilvestri/ecommerce-go/awsgo"
-	"github.com/ddessilvestri/ecommerce-go/models"
+	"github.com/lubualo/ecommerce-go/awsgo"
+	"github.com/lubualo/ecommerce-go/models"
 )
 
 func GetSecret(secretName string) (models.SecretRDSJson, error) {

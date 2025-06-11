@@ -4,7 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/ddessilvestri/ecommerce-go/models"
+	"github.com/lubualo/ecommerce-go/models"
 )
 
 // This struct acts like a "class" in Go.

@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/ddessilvestri/ecommerce-go/models"
+	"github.com/lubualo/ecommerce-go/models"
 )
 
 // Handler struct wires the service (depends on Service)

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/ddessilvestri/ecommerce-go/models"
+	"github.com/lubualo/ecommerce-go/models"
 	_ "github.com/go-sql-driver/mysql"
 )
 

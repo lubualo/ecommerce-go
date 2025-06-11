@@ -1,4 +1,4 @@
-module github.com/ddessilvestri/ecommerce-go
+module github.com/lubualo/ecommerce-go
 
 go 1.23.5
 
