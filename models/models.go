@@ -1,12 +1,12 @@
 package models
 
 type SecretRDSJson struct {
-	Username            string `json:"username"`
-	Password            string `json:"password"`
-	Engine              string `json:"engine"`
-	Host                string `json:"host"`
+	Username            string `json: "username"`
+	Password            string `json: "password"`
+	Engine              string `json: "engine"`
+	Host                string `json: "host"`
 	Port                int    `json:"port"`
-	DbClusterIdentifier string `json:"dbClusterIdentifier"`
+	DBClusterIdentifier string `json:"dbClusterIdentifier"`
 }
 
 type SignUp struct {
@@ -15,7 +15,7 @@ type SignUp struct {
 }
 
 type Category struct {
-	CategID	int `json:"categID"`
+	CategID   int    `json:"categID"`
 	CategName string `json:"categName"`
 	CategPath string `json:"categPath"`
-} 
+}

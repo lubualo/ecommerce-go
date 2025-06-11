@@ -16,6 +16,6 @@ func AWSInit() {
 	Cfg, err = config.LoadDefaultConfig(Ctx, config.WithDefaultRegion("us-east-1"))
 
 	if err != nil {
-		panic("Error while loading the configuration for .aws/config: " + err.Error())
+		panic("Error while loading configuration .aws/config" + err.Error())
 	}
 }

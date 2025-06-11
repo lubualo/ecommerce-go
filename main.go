@@ -2,53 +2,50 @@ package main
 
 import (
 	"context"
-	"os"
-	"strings"
-	"github.com/aws/aws-lambda-go/events"
-	"github.com/lubualo/ecommerce-go/awsgo"
-	"github.com/lubualo/ecommerce-go/db"
-	"github.com/lubualo/ecommerce-go/handlers"
 
-	lambda "github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+
+	"github.com/ddessilvestri/ecommerce-go/awsgo"
+	"github.com/ddessilvestri/ecommerce-go/db"
+	"github.com/ddessilvestri/ecommerce-go/internal/config"
+	"github.com/ddessilvestri/ecommerce-go/routers"
+	"github.com/ddessilvestri/ecommerce-go/secretm"
 )
 
-func main()  {
+func main() {
 	lambda.Start(LambdaExec)
 }
 
-func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest)  (*events.APIGatewayProxyResponse, error) {
+func LambdaExec(ctx context.Context, request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse, error) {
 	awsgo.AWSInit()
-	if !IsValid() {
-		panic("Missing param: 'SecretName', 'UserPoolId', 'Region' and 'UrlPrefix' are required")
-	}
-	var response *events.APIGatewayProxyResponse
-	path := strings.Replace(request.RawPath, os.Getenv("UrlPrefix"), "", -1)
-	method := request.RequestContext.HTTP.Method
-	body := request.Body
-	headers := request.Headers
-	
-	db.ReadSecret()
 
-	status, message := handlers.Handlers(path, method, body, headers, request)
+	conf, err := config.LoadConfig()
+	if err != nil {
+		panic("Config load failed: " + err.Error())
+	}
 
-	responseHeaders := map[string]string {
-		"Content-Type": "application/json",
+	// Read secrets
+	secret, err := secretm.GetSecret(conf.SecretName)
+	if err != nil {
+		return &events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Failed to read secret: " + err.Error(),
+		}, nil
 	}
-	response = &events.APIGatewayProxyResponse{
-		StatusCode: status,
-		Body: message,
-		Headers: responseHeaders,
+
+	// Connect to DB using secret + config
+	sqlDB, err := db.DbConnectAndReturn(secret, conf.DBName)
+	if err != nil {
+		return &events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Database connection error: " + err.Error(),
+		}, nil
 	}
+	defer sqlDB.Close()
+
+	// Route
+	response := routers.Router(request, conf.UrlPrefix, sqlDB)
 
 	return response, nil
-}
-
-func IsValid() bool {
-	var hasParam bool
-	_, hasParam = os.LookupEnv("SecretName")
-	if !hasParam {
-		return hasParam
-	}
-	_, hasParam = os.LookupEnv("UrlPrefix")
-	return hasParam
 }

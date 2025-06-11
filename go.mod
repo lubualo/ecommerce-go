@@ -1,12 +1,18 @@
-module github.com/lubualo/ecommerce-go
+module github.com/ddessilvestri/ecommerce-go
 
 go 1.23.5
 
-require github.com/go-sql-driver/mysql v1.9.2
+require (
+	github.com/Masterminds/squirrel v1.5.4
+	github.com/aws/aws-lambda-go v1.48.0
+	github.com/aws/aws-sdk-go-v2 v1.36.3
+	github.com/aws/aws-sdk-go-v2/config v1.29.14
+	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.35.4
+	github.com/go-sql-driver/mysql v1.9.2
+)
 
 require (
-	github.com/Masterminds/squirrel v1.5.4 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.36.3 // indirect
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.67 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.30 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.34 // indirect
@@ -20,11 +26,4 @@ require (
 	github.com/aws/smithy-go v1.22.2 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
-)
-
-require (
-	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/aws/aws-lambda-go v1.48.0
-	github.com/aws/aws-sdk-go-v2/config v1.29.14
-	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.35.4
 )
