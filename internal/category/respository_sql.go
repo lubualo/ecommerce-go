@@ -65,3 +65,59 @@ func (r *repositorySQL) Delete(id int) error {
 	}
 	return nil
 }
+
+func (r *repositorySQL) GetById(id int) (models.Category, error) {
+	query, args, err := squirrel.
+		Select("Categ_Name", "Categ_Path").
+		From("category").
+		Where(squirrel.Eq{"Categ_Id": id}).
+		ToSql()
+
+	if err != nil {
+		return models.Category{}, err
+	}
+	row := r.db.QueryRow(query, args...)
+
+	var name, path string
+	if err := row.Scan(&name, &path); err != nil {
+		return models.Category{}, err
+	}
+
+	return models.Category{
+		CategID:   id,
+		CategName: name,
+		CategPath: path,
+	}, nil
+}
+
+func (r *repositorySQL) GetAll() ([]models.Category, error) {
+	query, args, err := squirrel.
+		Select("Categ_Id", "Categ_Name", "Categ_Path").
+		From("category").
+		ToSql()
+
+	if err != nil {
+		return []models.Category{}, err
+	}
+
+	rows, err := r.db.Query(query, args...)
+	if err != nil {
+		return []models.Category{}, err
+	}
+	defer rows.Close()
+
+	var categories []models.Category
+	var id int
+	var name, path string
+	for rows.Next() {
+		if err := rows.Scan(&id, &name, &path); err != nil {
+			return []models.Category{}, err
+		}
+		categories = append(categories, models.Category{
+			CategID:   id,
+			CategName: name,
+			CategPath: path,
+		})
+	}
+	return categories, nil
+}

@@ -41,5 +41,17 @@ func (s *Service) Delete(id int) (error) {
 	return s.repo.Delete(id)
 }
 
+func (s *Service) GetById(id int) (models.Category, error) {
+	if id < 1 {
+		return models.Category{}, ErrInvalidId
+	}
+
+	return s.repo.GetById(id)
+}
+
+func (s *Service) GetAll() ([]models.Category, error) {
+	return s.repo.GetAll()
+}
+
 var ErrMissingNameOrPath = errors.New("invalid category: name and path are required")
 var ErrInvalidId = errors.New("invalid category id")
