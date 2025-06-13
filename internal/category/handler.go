@@ -29,7 +29,7 @@ func (h *Handler) Post(request events.APIGatewayV2HTTPRequest) (*events.APIGatew
 		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid JSON body: "+err.Error()), nil
 	}
 
-	id, err := h.service.CreateCategory(c)
+	id, err := h.service.Create(c)
 	if err != nil {
 		return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error()), nil
 	}
@@ -53,10 +53,24 @@ func (h *Handler) Put(request events.APIGatewayV2HTTPRequest) (*events.APIGatewa
 	}
 
 	c.CategID = id
-	err = h.service.UpdateCategory(c)
+	err = h.service.Update(c)
 	if err != nil {
 		return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error()), nil
 	}
 
 	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf("Category updated: %d", id)), nil
+}
+
+func (h *Handler) Delete(request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse, error) {
+	id, err := strconv.Atoi(request.PathParameters["id"])
+	if err != nil {
+		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid ID: "+err.Error()), nil
+	}
+
+	err = h.service.Delete(id)
+	if err != nil {
+		return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error()), nil
+	}
+
+	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf("Category deleted: %d", id)), nil
 }

@@ -15,7 +15,7 @@ func NewSQLRepository(db *sql.DB) Storage {
 	return &repositorySQL{db: db}
 }
 
-func (r *repositorySQL) InsertCategory(c models.Category) (int64, error) {
+func (r *repositorySQL) Insert(c models.Category) (int64, error) {
 	query, args, err := squirrel.
 		Insert("category").
 		Columns("Categ_Name", "Categ_Path").
@@ -34,7 +34,7 @@ func (r *repositorySQL) InsertCategory(c models.Category) (int64, error) {
 	return result.LastInsertId()
 }
 
-func (r *repositorySQL) UpdateCategory(c models.Category) error {
+func (r *repositorySQL) Update(c models.Category) error {
 	query, args, err := squirrel.
 		Update("category").
 		Set("Categ_Name", c.CategName).
@@ -49,5 +49,19 @@ func (r *repositorySQL) UpdateCategory(c models.Category) error {
 		return err
 	}
 	return nil
+}
 
+func (r *repositorySQL) Delete(id int) error {
+	query, args, err := squirrel.
+		Delete("category").
+		Where(squirrel.Eq{"Categ_Id": id}).
+		ToSql()
+	if err != nil {
+		return err
+	}
+	_, err = r.db.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+	return nil
 }

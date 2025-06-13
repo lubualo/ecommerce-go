@@ -14,15 +14,15 @@ func NewCategoryService(repo Storage) *Service {
 	return &Service{repo: repo}
 }
 
-func (s *Service) CreateCategory(c models.Category) (int64, error) {
+func (s *Service) Create(c models.Category) (int64, error) {
 	if c.CategName == "" || c.CategPath == "" {
 		return 0, ErrMissingNameOrPath
 	}
 
-	return s.repo.InsertCategory(c)
+	return s.repo.Insert(c)
 }
 
-func (s *Service) UpdateCategory(c models.Category) (error) {
+func (s *Service) Update(c models.Category) (error) {
 	if c.CategName == "" || c.CategPath == "" {
 		return ErrMissingNameOrPath
 	}
@@ -30,7 +30,15 @@ func (s *Service) UpdateCategory(c models.Category) (error) {
 		return ErrInvalidId
 	}
 
-	return s.repo.UpdateCategory(c)
+	return s.repo.Update(c)
+}
+
+func (s *Service) Delete(id int) (error) {
+	if id < 1 {
+		return ErrInvalidId
+	}
+
+	return s.repo.Delete(id)
 }
 
 var ErrMissingNameOrPath = errors.New("invalid category: name and path are required")
