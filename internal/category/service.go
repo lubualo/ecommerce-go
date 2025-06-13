@@ -49,9 +49,17 @@ func (s *Service) GetById(id int) (models.Category, error) {
 	return s.repo.GetById(id)
 }
 
+func (s *Service) GetBySlug(slug string) ([]models.Category, error) {
+	if slug == "" {
+		return []models.Category{}, ErrEmptySlug
+	}
+	return s.repo.GetBySlug(slug)
+}
+
 func (s *Service) GetAll() ([]models.Category, error) {
 	return s.repo.GetAll()
 }
 
 var ErrMissingNameOrPath = errors.New("invalid category: name and path are required")
 var ErrInvalidId = errors.New("invalid category id")
+var ErrEmptySlug = errors.New("empty category slug")

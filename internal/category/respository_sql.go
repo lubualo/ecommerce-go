@@ -90,6 +90,39 @@ func (r *repositorySQL) GetById(id int) (models.Category, error) {
 	}, nil
 }
 
+func (r *repositorySQL) GetBySlug(slug string) ([]models.Category, error) {
+	query, args, err := squirrel.
+		Select("Categ_Id", "Categ_Name", "Categ_Path").
+		From("category").
+		Where(squirrel.Like{"Categ_Path": "%" + slug + "%"}).
+		ToSql()
+
+	if err != nil {
+		return []models.Category{}, err
+	}
+
+	rows, err := r.db.Query(query, args...)
+	if err != nil {
+		return []models.Category{}, err
+	}
+	defer rows.Close()
+
+	var categories []models.Category
+	var id int
+	var name, path string
+	for rows.Next() {
+		if err := rows.Scan(&id, &name, &path); err != nil {
+			return []models.Category{}, err
+		}
+		categories = append(categories, models.Category{
+			CategID:   id,
+			CategName: name,
+			CategPath: path,
+		})
+	}
+	return categories, nil
+}
+
 func (r *repositorySQL) GetAll() ([]models.Category, error) {
 	query, args, err := squirrel.
 		Select("Categ_Id", "Categ_Name", "Categ_Path").

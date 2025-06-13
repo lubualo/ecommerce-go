@@ -76,34 +76,32 @@ func (h *Handler) Delete(request events.APIGatewayV2HTTPRequest) (*events.APIGat
 }
 
 func (h *Handler) Get(request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse, error) {
+	var categories []models.Category
+	var err error
+
 	idStr := request.QueryStringParameters["id"]
+	slug := request.QueryStringParameters["slug"]
+
 	if idStr != "" {
-		id, err := strconv.Atoi(idStr)
+		var id int
+		id, err = strconv.Atoi(idStr)
 		if err != nil {
 			return tools.CreateApiResponse(http.StatusBadRequest, "Invalid ID: "+err.Error()), nil
 		}
-
-		c, err := h.service.GetById(id)
-		if err != nil {
-			return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error()), nil
-		}
-
-		body, err := json.Marshal(c)
-		if err != nil {
-			return tools.CreateApiResponse(http.StatusBadRequest, "Error converting model to JSON: "+err.Error()), nil
-		}
-
-		return tools.CreateApiResponse(http.StatusOK, string(body)), nil
+		var c models.Category
+		c, err = h.service.GetById(id)
+		categories = []models.Category{c}
+	} else if slug != "" {
+		categories, err = h.service.GetBySlug(slug)
+	} else {
+		categories, err = h.service.GetAll()
 	}
-	categories, err := h.service.GetAll()
 	if err != nil {
 		return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error()), nil
 	}
-
 	body, err := json.Marshal(categories)
 	if err != nil {
-		return tools.CreateApiResponse(http.StatusInternalServerError, "Error converting models to JSON: "+err.Error()), nil
+		return tools.CreateApiResponse(http.StatusBadRequest, "Error converting to JSON: "+err.Error()), nil
 	}
-
 	return tools.CreateApiResponse(http.StatusOK, string(body)), nil
 }
