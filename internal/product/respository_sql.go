@@ -69,22 +69,22 @@ func (r *repositorySQL) Update(p models.Product) error {
 		Set("Prod_Updated", squirrel.Expr("NOW()"))
 
 	if p.Title != "" {
-		update.Set("Prod_Title", p.Title)
+		update = update.Set("Prod_Title", p.Title)
 	}
 	if p.Description != "" {
-		update.Set("Prod_Description", p.Description)
+		update = update.Set("Prod_Description", p.Description)
 	}
 	if p.Price > 0 {
-		update.Set("Prod_Price", p.Price)
+		update = update.Set("Prod_Price", p.Price)
 	}
 	if p.CategoryId > 0 {
-		update.Set("Prod_CategId", p.CategoryId)
+		update = update.Set("Prod_CategId", p.CategoryId)
 	}
 	if p.Stock > 0 {
-		update.Set("Prod_Stock", p.Stock)
+		update = update.Set("Prod_Stock", p.Stock)
 	}
 	if p.Path != "" {
-		update.Set("Prod_Path", p.Path)
+		update = update.Set("Prod_Path", p.Path)
 	}
 
 	query, args, err := update.

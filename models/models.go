@@ -28,7 +28,7 @@ type Product struct {
 	Updated      string  `json:"prodUpdated"`
 	Price        float64 `json:"prodPrice,omitempty"`
 	Stock        int     `json:"prodStock"`
-	CategoryId   int  `json:"prodCategId"`
+	CategoryId   int     `json:"prodCategId"`
 	Path         string  `json:"prodPath"`
 	Search       string  `json:"search,omitempty"`
 	CategoryPath string  `json:"categPath,omitempty"`
