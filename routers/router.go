@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/auth"
 	"github.com/lubualo/ecommerce-go/internal/category"
+	"github.com/lubualo/ecommerce-go/internal/product"
 	"github.com/lubualo/ecommerce-go/tools"
 )
 
@@ -57,8 +58,8 @@ func CreateRouter(entity string, db *sql.DB) (EntityRouter, error) {
 	switch entity {
 	case "category":
 		return category.NewRouter(db), nil
-	// case "product":
-	//     return product.NewProductRouter(), nil
+	case "product":
+	    return product.NewRouter(db), nil
 	default:
 		return nil, fmt.Errorf("entity '%s' not implemented", entity)
 	}

@@ -20,6 +20,7 @@ func (r *repositorySQL) Insert(c models.Category) (int64, error) {
 		Insert("category").
 		Columns("Categ_Name", "Categ_Path").
 		Values(c.CategName, c.CategPath).
+		PlaceholderFormat(squirrel.Question).
 		ToSql()
 
 	if err != nil {
@@ -40,6 +41,7 @@ func (r *repositorySQL) Update(c models.Category) error {
 		Set("Categ_Name", c.CategName).
 		Set("Categ_Path", c.CategPath).
 		Where(squirrel.Eq{"Categ_Id": c.CategID}).
+		PlaceholderFormat(squirrel.Question).
 		ToSql()
 	if err != nil {
 		return err
@@ -55,6 +57,7 @@ func (r *repositorySQL) Delete(id int) error {
 	query, args, err := squirrel.
 		Delete("category").
 		Where(squirrel.Eq{"Categ_Id": id}).
+		PlaceholderFormat(squirrel.Question).
 		ToSql()
 	if err != nil {
 		return err
@@ -71,6 +74,7 @@ func (r *repositorySQL) GetById(id int) (models.Category, error) {
 		Select("Categ_Name", "Categ_Path").
 		From("category").
 		Where(squirrel.Eq{"Categ_Id": id}).
+		PlaceholderFormat(squirrel.Question).
 		ToSql()
 
 	if err != nil {
@@ -95,6 +99,7 @@ func (r *repositorySQL) GetBySlug(slug string) ([]models.Category, error) {
 		Select("Categ_Id", "Categ_Name", "Categ_Path").
 		From("category").
 		Where(squirrel.Like{"Categ_Path": "%" + slug + "%"}).
+		PlaceholderFormat(squirrel.Question).
 		ToSql()
 
 	if err != nil {
@@ -127,6 +132,7 @@ func (r *repositorySQL) GetAll() ([]models.Category, error) {
 	query, args, err := squirrel.
 		Select("Categ_Id", "Categ_Name", "Categ_Path").
 		From("category").
+		PlaceholderFormat(squirrel.Question).
 		ToSql()
 
 	if err != nil {
