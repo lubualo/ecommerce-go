@@ -10,10 +10,10 @@ type Router struct {
 	handler *Handler
 }
 
-func NewCategoryRouter(db *sql.DB) *Router {
+func NewRouter(db *sql.DB) *Router {
 	repo := NewSQLRepository(db)
-	service := NewCategoryService(repo)
-	handler := NewCategoryHandler(service)
+	service := NewService(repo)
+	handler := NewHandler(service)
 	return &Router{handler: handler}
 }
 

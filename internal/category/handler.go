@@ -15,7 +15,7 @@ type Handler struct {
 	service *Service
 }
 
-func NewCategoryHandler(service *Service) *Handler {
+func NewHandler(service *Service) *Handler {
 	return &Handler{service: service}
 }
 

@@ -56,7 +56,7 @@ func Router(request events.APIGatewayV2HTTPRequest, urlPrefix string, db *sql.DB
 func CreateRouter(entity string, db *sql.DB) (EntityRouter, error) {
 	switch entity {
 	case "category":
-		return category.NewCategoryRouter(db), nil
+		return category.NewRouter(db), nil
 	// case "product":
 	//     return product.NewProductRouter(), nil
 	default:

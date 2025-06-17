@@ -10,7 +10,7 @@ type Service struct {
 	repo Storage
 }
 
-func NewCategoryService(repo Storage) *Service {
+func NewService(repo Storage) *Service {
 	return &Service{repo: repo}
 }
 
@@ -22,7 +22,7 @@ func (s *Service) Create(c models.Category) (int64, error) {
 	return s.repo.Insert(c)
 }
 
-func (s *Service) Update(c models.Category) (error) {
+func (s *Service) Update(c models.Category) error {
 	if c.CategName == "" || c.CategPath == "" {
 		return ErrMissingNameOrPath
 	}
@@ -33,7 +33,7 @@ func (s *Service) Update(c models.Category) (error) {
 	return s.repo.Update(c)
 }
 
-func (s *Service) Delete(id int) (error) {
+func (s *Service) Delete(id int) error {
 	if id < 1 {
 		return ErrInvalidId
 	}
