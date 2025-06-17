@@ -22,16 +22,15 @@ func (s *Service) Create(p models.Product) (int64, error) {
 	return s.repo.Insert(p)
 }
 
-func (s *Service) Update(c models.Category) error {
-	return ErrInvalidId
-	// if c.CategName == "" || c.CategPath == "" {
-	// 	return ErrMissingNameOrPath
-	// }
-	// if c.CategID < 1 {
-	// 	return ErrInvalidId
-	// }
+func (s *Service) Update(p models.Product) error {
+	if p.Title == "" {
+		return ErrMissingTitle
+	}
+	if p.Id < 1 {
+		return ErrInvalidId
+	}
 
-	// return s.repo.Update(c)
+	return s.repo.Update(p)
 }
 
 func (s *Service) Delete(id int) error {

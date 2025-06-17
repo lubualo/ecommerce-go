@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/models"
@@ -37,28 +38,27 @@ func (h *Handler) Post(request events.APIGatewayV2HTTPRequest) *events.APIGatewa
 }
 
 func (h *Handler) Put(request events.APIGatewayV2HTTPRequest) *events.APIGatewayProxyResponse {
-	return tools.CreateApiResponse(http.StatusMethodNotAllowed, "Not implemented")
-	// body := request.Body
+	body := request.Body
 
-	// var c models.Category
+	var p models.Product
 
-	// err := json.Unmarshal([]byte(body), &c)
-	// if err != nil {
-	// 	return tools.CreateApiResponse(http.StatusBadRequest, "Invalid JSON body: "+err.Error()), nil
-	// }
+	err := json.Unmarshal([]byte(body), &p)
+	if err != nil {
+		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid JSON body: "+err.Error())
+	}
 
-	// id, err := strconv.Atoi(request.PathParameters["id"])
-	// if err != nil {
-	// 	return tools.CreateApiResponse(http.StatusBadRequest, "Invalid ID: "+err.Error()), nil
-	// }
+	id, err := strconv.Atoi(request.PathParameters["id"])
+	if err != nil {
+		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid ID: "+err.Error())
+	}
 
-	// c.CategID = id
-	// err = h.service.Update(c)
-	// if err != nil {
-	// 	return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error()), nil
-	// }
+	p.Id = id
+	err = h.service.Update(p)
+	if err != nil {
+		return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error())
+	}
 
-	// return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf("Category updated: %d", id)), nil
+	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf("Product updated: %d", id))
 }
 
 func (h *Handler) Delete(request events.APIGatewayV2HTTPRequest) *events.APIGatewayProxyResponse {
