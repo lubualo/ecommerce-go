@@ -104,19 +104,18 @@ func (r *repositorySQL) Update(p models.Product) error {
 }
 
 func (r *repositorySQL) Delete(id int) error {
+	query, args, err := squirrel.
+		Delete("products").
+		Where(squirrel.Eq{"Prod_Id": id}).
+		ToSql()
+	if err != nil {
+		return err
+	}
+	_, err = r.db.Exec(query, args...)
+	if err != nil {
+		return err
+	}
 	return nil
-	// query, args, err := squirrel.
-	// 	Delete("category").
-	// 	Where(squirrel.Eq{"Categ_Id": id}).
-	// 	ToSql()
-	// if err != nil {
-	// 	return err
-	// }
-	// _, err = r.db.Exec(query, args...)
-	// if err != nil {
-	// 	return err
-	// }
-	// return nil
 }
 
 func (r *repositorySQL) GetById(id int) (models.Product, error) {

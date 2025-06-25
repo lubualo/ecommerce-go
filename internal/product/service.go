@@ -34,12 +34,11 @@ func (s *Service) Update(p models.Product) error {
 }
 
 func (s *Service) Delete(id int) error {
-	return ErrInvalidId
-	// if id < 1 {
-	// 	return ErrInvalidId
-	// }
+	if id < 1 {
+		return ErrInvalidId
+	}
 
-	// return s.repo.Delete(id)
+	return s.repo.Delete(id)
 }
 
 func (s *Service) GetById(id int) (models.Product, error) {

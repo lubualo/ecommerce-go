@@ -62,18 +62,17 @@ func (h *Handler) Put(request events.APIGatewayV2HTTPRequest) *events.APIGateway
 }
 
 func (h *Handler) Delete(request events.APIGatewayV2HTTPRequest) *events.APIGatewayProxyResponse {
-	return tools.CreateApiResponse(http.StatusMethodNotAllowed, "Not implemented")
-	// id, err := strconv.Atoi(request.PathParameters["id"])
-	// if err != nil {
-	// 	return tools.CreateApiResponse(http.StatusBadRequest, "Invalid ID: "+err.Error()), nil
-	// }
+	id, err := strconv.Atoi(request.PathParameters["id"])
+	if err != nil {
+		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid ID: "+err.Error())
+	}
 
-	// err = h.service.Delete(id)
-	// if err != nil {
-	// 	return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error()), nil
-	// }
+	err = h.service.Delete(id)
+	if err != nil {
+		return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error())
+	}
 
-	// return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf("Category deleted: %d", id)), nil
+	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf("Product deleted: %d", id))
 }
 
 func (h *Handler) Get(request events.APIGatewayV2HTTPRequest) *events.APIGatewayProxyResponse {
