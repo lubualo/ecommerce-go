@@ -1,10 +1,10 @@
 package models
 
 type SecretRDSJson struct {
-	Username            string `json: "username"`
-	Password            string `json: "password"`
-	Engine              string `json: "engine"`
-	Host                string `json: "host"`
+	Username            string `json:"username"`
+	Password            string `json:"password"`
+	Engine              string `json:"engine"`
+	Host                string `json:"host"`
 	Port                int    `json:"port"`
 	DBClusterIdentifier string `json:"dbClusterIdentifier"`
 }
@@ -27,9 +27,8 @@ type Product struct {
 	CreatedAt    string  `json:"prodCreatedAt"`
 	Updated      string  `json:"prodUpdated"`
 	Price        float64 `json:"prodPrice,omitempty"`
+	Path         string  `json:"prodPath"`
 	Stock        int     `json:"prodStock"`
 	CategoryId   int     `json:"prodCategId"`
-	Path         string  `json:"prodPath"`
-	Search       string  `json:"search,omitempty"`
 	CategoryPath string  `json:"categPath,omitempty"`
 }
