@@ -10,6 +10,7 @@ import (
 	"github.com/lubualo/ecommerce-go/auth"
 	"github.com/lubualo/ecommerce-go/internal/category"
 	"github.com/lubualo/ecommerce-go/internal/product"
+	"github.com/lubualo/ecommerce-go/internal/stock"
 	"github.com/lubualo/ecommerce-go/tools"
 )
 
@@ -60,6 +61,8 @@ func CreateRouter(entity string, db *sql.DB) (EntityRouter, error) {
 		return category.NewRouter(db), nil
 	case "product":
 	    return product.NewRouter(db), nil
+	case "stock":
+	    return stock.NewRouter(db), nil
 	default:
 		return nil, fmt.Errorf("entity '%s' not implemented", entity)
 	}
