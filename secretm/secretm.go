@@ -11,8 +11,8 @@ import (
 	"github.com/lubualo/ecommerce-go/models"
 )
 
-func GetSecret(secretName string) (models.SecretRDSJson, error) {
-	var secretData models.SecretRDSJson
+func GetSecret(secretName string) (models.RDSCredentials, error) {
+	var secretData models.RDSCredentials
 	fmt.Println(" > Secret Request " + secretName)
 	svc := secretsmanager.NewFromConfig(awsgo.Cfg)
 	key, err := svc.GetSecretValue(awsgo.Ctx, &secretsmanager.GetSecretValueInput{

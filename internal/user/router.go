@@ -1,10 +1,12 @@
-package category
+package user
 
 import (
 	"database/sql"
+	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/models"
+	"github.com/lubualo/ecommerce-go/tools"
 )
 
 type Router struct {
@@ -19,21 +21,17 @@ func NewRouter(db *sql.DB) *Router {
 }
 
 func (r *Router) Post(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
-	resp, _ := r.handler.Post(requestWithContext)
-	return resp
+	return tools.CreateApiResponse(http.StatusMethodNotAllowed, "not implemented")
 }
 
 func (r *Router) Get(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
-	resp, _ := r.handler.Get(requestWithContext)
-	return resp
+	return r.handler.Get(requestWithContext)
 }
 
 func (r *Router) Put(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
-	resp, _ := r.handler.Put(requestWithContext)
-	return resp
+	return r.handler.Put(requestWithContext)
 }
 
 func (r *Router) Delete(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
-	resp, _ := r.handler.Delete(requestWithContext)
-	return resp
+	return tools.CreateApiResponse(http.StatusMethodNotAllowed, "not implemented")
 }

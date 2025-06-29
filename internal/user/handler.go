@@ -1,4 +1,4 @@
-package product
+package user
 
 import (
 	"encoding/json"
@@ -18,24 +18,6 @@ type Handler struct {
 
 func NewHandler(service *Service) *Handler {
 	return &Handler{service: service}
-}
-
-func (h *Handler) Post(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
-	body := requestWithContext.RequestBody()
-
-	var p models.Product
-
-	err := json.Unmarshal([]byte(body), &p)
-	if err != nil {
-		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid JSON body: "+err.Error())
-	}
-
-	id, err := h.service.Create(p)
-	if err != nil {
-		return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error())
-	}
-
-	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf(`{"ProdID": %d}`, id))
 }
 
 func (h *Handler) Put(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
@@ -61,21 +43,6 @@ func (h *Handler) Put(requestWithContext models.RequestWithContext) *events.APIG
 
 	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf("Product updated: %d", id))
 }
-
-func (h *Handler) Delete(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
-	id, err := strconv.Atoi(requestWithContext.RequestPathParameters()["id"])
-	if err != nil {
-		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid ID: "+err.Error())
-	}
-
-	err = h.service.Delete(id)
-	if err != nil {
-		return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error())
-	}
-
-	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf("Product deleted: %d", id))
-}
-
 func (h *Handler) Get(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
 	query := requestWithContext.RequestQueryStringParameters()
 

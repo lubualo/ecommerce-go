@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/lubualo/ecommerce-go/models"
 	"github.com/lubualo/ecommerce-go/tools"
 )
 
@@ -22,8 +23,8 @@ type stockUpdate struct {
 	Delta int `json:"delta"`
 }
 
-func (h *Handler) Put(request events.APIGatewayV2HTTPRequest) *events.APIGatewayProxyResponse {
-	body := request.Body
+func (h *Handler) Put(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
+	body := requestWithContext.RequestBody()
 
 	var s stockUpdate
 
@@ -32,7 +33,7 @@ func (h *Handler) Put(request events.APIGatewayV2HTTPRequest) *events.APIGateway
 		return tools.CreateApiResponse(http.StatusBadRequest, "invalid JSON body: "+err.Error())
 	}
 
-	productId, err := strconv.Atoi(request.PathParameters["productId"])
+	productId, err := strconv.Atoi(requestWithContext.RequestPathParameters()["productId"])
 	if err != nil {
 		return tools.CreateApiResponse(http.StatusBadRequest, "invalid productId: "+err.Error())
 	}

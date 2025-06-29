@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"net/http"
@@ -8,9 +9,11 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/auth"
+	authcontext "github.com/lubualo/ecommerce-go/auth/context"
 	"github.com/lubualo/ecommerce-go/internal/category"
 	"github.com/lubualo/ecommerce-go/internal/product"
 	"github.com/lubualo/ecommerce-go/internal/stock"
+	"github.com/lubualo/ecommerce-go/models"
 	"github.com/lubualo/ecommerce-go/tools"
 )
 
@@ -30,26 +33,30 @@ func Router(request events.APIGatewayV2HTTPRequest, urlPrefix string, db *sql.DB
 
 	entityRouter, err := CreateRouter(firstSegment, db)
 	if err != nil {
-		return tools.CreateApiResponse(http.StatusBadRequest, "Unable to route request: " + err.Error())
+		return tools.CreateApiResponse(http.StatusBadRequest, "Unable to route request: "+err.Error())
 	}
 
-	isOk, statusCode, user := auth.AuthValidation(path, method, header)
-	if !isOk {
-		return &events.APIGatewayProxyResponse{
-			StatusCode: statusCode,
-			Body:       user,
+	var authUser *models.AuthUser
+
+	if !(path == "product" && method == "GET") && !(path == "category" && method == "GET") {
+		authUser, err = auth.ExtractAuthUser(header)
+		if err != nil {
+			return tools.CreateApiResponse(http.StatusUnauthorized, "Unable to authenticate user: "+err.Error())
 		}
 	}
 
+	context := authcontext.WithUser(context.Background(), authUser)
+    requestWithContext := models.NewRequestWithContext(request, context)
+
 	switch method {
 	case GET:
-		return entityRouter.Get(request)
+		return entityRouter.Get(requestWithContext)
 	case POST:
-		return entityRouter.Post(request)
+		return entityRouter.Post(requestWithContext)
 	case PUT:
-		return entityRouter.Put(request)
+		return entityRouter.Put(requestWithContext)
 	case DELETE:
-		return entityRouter.Delete(request)
+		return entityRouter.Delete(requestWithContext)
 	default:
 		return tools.CreateApiResponse(http.StatusMethodNotAllowed, "Method not allowed")
 	}
@@ -60,9 +67,9 @@ func CreateRouter(entity string, db *sql.DB) (EntityRouter, error) {
 	case "category":
 		return category.NewRouter(db), nil
 	case "product":
-	    return product.NewRouter(db), nil
+		return product.NewRouter(db), nil
 	case "stock":
-	    return stock.NewRouter(db), nil
+		return stock.NewRouter(db), nil
 	default:
 		return nil, fmt.Errorf("entity '%s' not implemented", entity)
 	}

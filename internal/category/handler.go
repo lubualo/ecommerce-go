@@ -19,8 +19,8 @@ func NewHandler(service *Service) *Handler {
 	return &Handler{service: service}
 }
 
-func (h *Handler) Post(request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse, error) {
-	body := request.Body
+func (h *Handler) Post(requestWithContext models.RequestWithContext) (*events.APIGatewayProxyResponse, error) {
+	body := requestWithContext.RequestBody()
 
 	var c models.Category
 
@@ -37,8 +37,8 @@ func (h *Handler) Post(request events.APIGatewayV2HTTPRequest) (*events.APIGatew
 	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf(`{"CategID": %d}`, id)), nil
 }
 
-func (h *Handler) Put(request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse, error) {
-	body := request.Body
+func (h *Handler) Put(requestWithContext models.RequestWithContext) (*events.APIGatewayProxyResponse, error) {
+	body := requestWithContext.RequestBody()
 
 	var c models.Category
 
@@ -47,7 +47,7 @@ func (h *Handler) Put(request events.APIGatewayV2HTTPRequest) (*events.APIGatewa
 		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid JSON body: "+err.Error()), nil
 	}
 
-	id, err := strconv.Atoi(request.PathParameters["id"])
+	id, err := strconv.Atoi(requestWithContext.RequestPathParameters()["id"])
 	if err != nil {
 		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid ID: "+err.Error()), nil
 	}
@@ -61,8 +61,8 @@ func (h *Handler) Put(request events.APIGatewayV2HTTPRequest) (*events.APIGatewa
 	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf("Category updated: %d", id)), nil
 }
 
-func (h *Handler) Delete(request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse, error) {
-	id, err := strconv.Atoi(request.PathParameters["id"])
+func (h *Handler) Delete(requestWithContext models.RequestWithContext) (*events.APIGatewayProxyResponse, error) {
+	id, err := strconv.Atoi(requestWithContext.RequestPathParameters()["id"])
 	if err != nil {
 		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid ID: "+err.Error()), nil
 	}
@@ -75,12 +75,12 @@ func (h *Handler) Delete(request events.APIGatewayV2HTTPRequest) (*events.APIGat
 	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf("Category deleted: %d", id)), nil
 }
 
-func (h *Handler) Get(request events.APIGatewayV2HTTPRequest) (*events.APIGatewayProxyResponse, error) {
+func (h *Handler) Get(requestWithContext models.RequestWithContext) (*events.APIGatewayProxyResponse, error) {
 	var categories []models.Category
 	var err error
 
-	idStr := request.QueryStringParameters["id"]
-	slug := request.QueryStringParameters["slug"]
+	idStr := requestWithContext.RequestQueryStringParameters()["id"]
+	slug := requestWithContext.RequestQueryStringParameters()["slug"]
 
 	if idStr != "" {
 		var id int

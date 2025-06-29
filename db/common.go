@@ -10,7 +10,7 @@ import (
 	"github.com/lubualo/ecommerce-go/models"
 )
 
-func DbConnectAndReturn(secret models.SecretRDSJson, dbName string) (*sql.DB, error) {
+func DbConnectAndReturn(secret models.RDSCredentials, dbName string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", ConnStr(secret, dbName))
 	if err != nil {
 		fmt.Println(err.Error())
@@ -27,7 +27,7 @@ func DbConnectAndReturn(secret models.SecretRDSJson, dbName string) (*sql.DB, er
 	return db, nil
 }
 
-func ConnStr(json models.SecretRDSJson, dbName string) string {
+func ConnStr(json models.RDSCredentials, dbName string) string {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?allowCleartextPasswords=true",
 		json.Username,
 		json.Password,

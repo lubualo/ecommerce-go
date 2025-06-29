@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/lubualo/ecommerce-go/models"
 )
 
 type Router struct {
@@ -17,18 +18,18 @@ func NewRouter(db *sql.DB) *Router {
 	return &Router{handler: handler}
 }
 
-func (r *Router) Post(request events.APIGatewayV2HTTPRequest) *events.APIGatewayProxyResponse {
-	return r.handler.Post(request)
+func (r *Router) Post(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
+	return r.handler.Post(requestWithContext)
 }
 
-func (r *Router) Get(request events.APIGatewayV2HTTPRequest) *events.APIGatewayProxyResponse {
-	return r.handler.Get(request)
+func (r *Router) Get(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
+	return r.handler.Get(requestWithContext)
 }
 
-func (r *Router) Put(request events.APIGatewayV2HTTPRequest) *events.APIGatewayProxyResponse {
-	return r.handler.Put(request)
+func (r *Router) Put(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
+	return r.handler.Put(requestWithContext)
 }
 
-func (r *Router) Delete(request events.APIGatewayV2HTTPRequest) *events.APIGatewayProxyResponse {
-	return r.handler.Delete(request)
+func (r *Router) Delete(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
+	return r.handler.Delete(requestWithContext)
 }

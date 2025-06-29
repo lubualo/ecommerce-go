@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/lubualo/ecommerce-go/models"
 	"github.com/lubualo/ecommerce-go/tools"
 )
 
@@ -19,18 +20,18 @@ func NewRouter(db *sql.DB) *Router {
 	return &Router{handler: handler}
 }
 
-func (r *Router) Post(request events.APIGatewayV2HTTPRequest) *events.APIGatewayProxyResponse {
-	return tools.CreateApiResponse(http.StatusMethodNotAllowed, "not implemented")
+func (r *Router) Post(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
+	return tools.CreateApiResponse(http.StatusMethodNotAllowed, "not implemented")
 }
 
-func (r *Router) Get(request events.APIGatewayV2HTTPRequest) *events.APIGatewayProxyResponse {
-	return tools.CreateApiResponse(http.StatusMethodNotAllowed, "not implemented")
+func (r *Router) Get(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
+	return tools.CreateApiResponse(http.StatusMethodNotAllowed, "not implemented")
 }
 
-func (r *Router) Put(request events.APIGatewayV2HTTPRequest) *events.APIGatewayProxyResponse {
-	return r.handler.Put(request)
+func (r *Router) Put(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
+	return r.handler.Put(requestWithContext)
 }
 
-func (r *Router) Delete(request events.APIGatewayV2HTTPRequest) *events.APIGatewayProxyResponse {
-	return tools.CreateApiResponse(http.StatusMethodNotAllowed, "not implemented")
+func (r *Router) Delete(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
+	return tools.CreateApiResponse(http.StatusMethodNotAllowed, "not implemented")
 }
