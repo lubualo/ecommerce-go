@@ -19,7 +19,7 @@ func (r *repositorySQL) Insert(c models.Category) (int64, error) {
 	query, args, err := squirrel.
 		Insert("category").
 		Columns("Categ_Name", "Categ_Path").
-		Values(c.CategName, c.CategPath).
+		Values(c.Name, c.Path).
 		PlaceholderFormat(squirrel.Question).
 		ToSql()
 
@@ -38,9 +38,9 @@ func (r *repositorySQL) Insert(c models.Category) (int64, error) {
 func (r *repositorySQL) Update(c models.Category) error {
 	query, args, err := squirrel.
 		Update("category").
-		Set("Categ_Name", c.CategName).
-		Set("Categ_Path", c.CategPath).
-		Where(squirrel.Eq{"Categ_Id": c.CategID}).
+		Set("Categ_Name", c.Name).
+		Set("Categ_Path", c.Path).
+		Where(squirrel.Eq{"Categ_Id": c.Id}).
 		PlaceholderFormat(squirrel.Question).
 		ToSql()
 	if err != nil {
@@ -88,9 +88,9 @@ func (r *repositorySQL) GetById(id int) (models.Category, error) {
 	}
 
 	return models.Category{
-		CategID:   id,
-		CategName: name,
-		CategPath: path,
+		Id:   id,
+		Name: name,
+		Path: path,
 	}, nil
 }
 
@@ -120,9 +120,9 @@ func (r *repositorySQL) GetBySlug(slug string) ([]models.Category, error) {
 			return []models.Category{}, err
 		}
 		categories = append(categories, models.Category{
-			CategID:   id,
-			CategName: name,
-			CategPath: path,
+			Id:   id,
+			Name: name,
+			Path: path,
 		})
 	}
 	return categories, nil
@@ -153,9 +153,9 @@ func (r *repositorySQL) GetAll() ([]models.Category, error) {
 			return []models.Category{}, err
 		}
 		categories = append(categories, models.Category{
-			CategID:   id,
-			CategName: name,
-			CategPath: path,
+			Id:   id,
+			Name: name,
+			Path: path,
 		})
 	}
 	return categories, nil

@@ -15,7 +15,7 @@ func NewService(repo Storage) *Service {
 }
 
 func (s *Service) Create(c models.Category) (int64, error) {
-	if c.CategName == "" || c.CategPath == "" {
+	if c.Name == "" || c.Path == "" {
 		return 0, ErrMissingNameOrPath
 	}
 
@@ -23,10 +23,10 @@ func (s *Service) Create(c models.Category) (int64, error) {
 }
 
 func (s *Service) Update(c models.Category) error {
-	if c.CategName == "" || c.CategPath == "" {
+	if c.Name == "" || c.Path == "" {
 		return ErrMissingNameOrPath
 	}
-	if c.CategID < 1 {
+	if c.Id < 1 {
 		return ErrInvalidId
 	}
 

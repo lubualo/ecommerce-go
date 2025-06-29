@@ -1,14 +1,14 @@
 package models
 
 type Product struct {
-	Id           int     `json:"prodID"`
-	Title        string  `json:"prodTitle"`
-	Description  string  `json:"prodDescription"`
-	CreatedAt    string  `json:"prodCreatedAt"`
-	Updated      string  `json:"prodUpdated"`
-	Price        float64 `json:"prodPrice,omitempty"`
-	Path         string  `json:"prodPath"`
-	Stock        int     `json:"prodStock"`
-	CategoryId   int     `json:"prodCategId"`
-	CategoryPath string  `json:"categPath,omitempty"`
+	Id           int     `json:"id"`
+	Name         string  `json:"name"`
+	Description  string  `json:"description"`
+	CreatedAt    string  `json:"createdAt"`
+	Updated      string  `json:"updated"`
+	Price        float64 `json:"price,omitempty"`
+	Path         string  `json:"path"`
+	Stock        int     `json:"stock"`
+	CategoryId   int     `json:"categoryId"`
+	CategoryPath string  `json:"categoryPath,omitempty"`
 }

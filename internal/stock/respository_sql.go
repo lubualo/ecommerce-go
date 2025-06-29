@@ -18,7 +18,6 @@ func (r *repositorySQL) UpdateStock(productId, delta int) error {
 	query, args, err := squirrel.
 		Update("products").
 		PlaceholderFormat(squirrel.Question).
-		Set("Prod_Updated", squirrel.Expr("NOW()")).
 		Set("Prod_Stock", squirrel.Expr("Prod_Stock + ?", delta)).
 		Where(squirrel.Eq{"Prod_Id": productId}).
 		ToSql()

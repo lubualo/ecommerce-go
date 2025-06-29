@@ -94,12 +94,12 @@ func (h *Handler) Get(requestWithContext models.RequestWithContext) *events.APIG
 	}
 
 	// === 4. Filter by category ID ===
-	if catIdStr := strings.TrimSpace(query["categId"]); catIdStr != "" {
-		catId, err := strconv.Atoi(catIdStr)
-		if err != nil || catId <= 0 {
-			return tools.CreateApiResponse(http.StatusBadRequest, "invalid 'categId' parameter")
+	if catIdStr := strings.TrimSpace(query["categoryId"]); catIdStr != "" {
+		categoryId, err := strconv.Atoi(catIdStr)
+		if err != nil || categoryId <= 0 {
+			return tools.CreateApiResponse(http.StatusBadRequest, "invalid 'categoryId' parameter")
 		}
-		products, err := h.service.GetByCategoryId(catId)
+		products, err := h.service.GetByCategoryId(categoryId)
 		if err != nil {
 			return tools.CreateApiResponse(http.StatusInternalServerError, err.Error())
 		}

@@ -34,7 +34,7 @@ func (h *Handler) Post(requestWithContext models.RequestWithContext) (*events.AP
 		return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error()), nil
 	}
 
-	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf(`{"CategID": %d}`, id)), nil
+	return tools.CreateApiResponse(http.StatusOK, fmt.Sprintf(`{"CategoryId": %d}`, id)), nil
 }
 
 func (h *Handler) Put(requestWithContext models.RequestWithContext) (*events.APIGatewayProxyResponse, error) {
@@ -52,7 +52,7 @@ func (h *Handler) Put(requestWithContext models.RequestWithContext) (*events.API
 		return tools.CreateApiResponse(http.StatusBadRequest, "Invalid ID: "+err.Error()), nil
 	}
 
-	c.CategID = id
+	c.Id = id
 	err = h.service.Update(c)
 	if err != nil {
 		return tools.CreateApiResponse(http.StatusBadRequest, "Error: "+err.Error()), nil

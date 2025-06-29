@@ -15,7 +15,7 @@ func NewService(repo Storage) *Service {
 }
 
 func (s *Service) Create(p models.Product) (int64, error) {
-	if p.Title == "" {
+	if p.Name == "" {
 		return 0, ErrMissingTitle
 	}
 
@@ -23,7 +23,7 @@ func (s *Service) Create(p models.Product) (int64, error) {
 }
 
 func (s *Service) Update(p models.Product) error {
-	if p.Title == "" {
+	if p.Name == "" {
 		return ErrMissingTitle
 	}
 	if p.Id < 1 {

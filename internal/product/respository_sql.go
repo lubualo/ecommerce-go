@@ -21,7 +21,7 @@ func (r *repositorySQL) Insert(p models.Product) (int64, error) {
 	values := []interface{}{}
 
 	columns = append(columns, "Prod_Title")
-	values = append(values, p.Title)
+	values = append(values, p.Name)
 
 	if p.Description != "" {
 		columns = append(columns, "Prod_Description")
@@ -66,11 +66,10 @@ func (r *repositorySQL) Insert(p models.Product) (int64, error) {
 func (r *repositorySQL) Update(p models.Product) error {
 	update := squirrel.
 		Update("products").
-		PlaceholderFormat(squirrel.Question).
-		Set("Prod_Updated", squirrel.Expr("NOW()"))
+		PlaceholderFormat(squirrel.Question)
 
-	if p.Title != "" {
-		update = update.Set("Prod_Title", p.Title)
+	if p.Name != "" {
+		update = update.Set("Prod_Title", p.Name)
 	}
 	if p.Description != "" {
 		update = update.Set("Prod_Description", p.Description)
@@ -135,7 +134,7 @@ func (r *repositorySQL) GetById(id int) (models.Product, error) {
 
 	row := r.db.QueryRow(query, args...)
 	var p models.Product
-	err = row.Scan(&p.Id, &p.Title, &p.Description, &p.CreatedAt, &p.Updated, &p.Price, &p.Path, &p.CategoryId, &p.Stock, &p.CategoryPath)
+	err = row.Scan(&p.Id, &p.Name, &p.Description, &p.CreatedAt, &p.Updated, &p.Price, &p.Path, &p.CategoryId, &p.Stock, &p.CategoryPath)
 	if err != nil {
 		return models.Product{}, err
 	}
@@ -158,7 +157,7 @@ func (r *repositorySQL) GetBySlug(slug string) (models.Product, error) {
 
 	row := r.db.QueryRow(query, args...)
 	var p models.Product
-	err = row.Scan(&p.Id, &p.Title, &p.Description, &p.CreatedAt, &p.Updated, &p.Price, &p.Path, &p.CategoryId, &p.Stock, &p.CategoryPath)
+	err = row.Scan(&p.Id, &p.Name, &p.Description, &p.CreatedAt, &p.Updated, &p.Price, &p.Path, &p.CategoryId, &p.Stock, &p.CategoryPath)
 	if err != nil {
 		return models.Product{}, err
 	}
@@ -188,7 +187,7 @@ func (r *repositorySQL) GetByCategoryId(catId int) ([]models.Product, error) {
 	var products []models.Product
 	for rows.Next() {
 		var p models.Product
-		if err := rows.Scan(&p.Id, &p.Title, &p.Description, &p.CreatedAt, &p.Updated, &p.Price, &p.Path, &p.CategoryId, &p.Stock, &p.CategoryPath); err != nil {
+		if err := rows.Scan(&p.Id, &p.Name, &p.Description, &p.CreatedAt, &p.Updated, &p.Price, &p.Path, &p.CategoryId, &p.Stock, &p.CategoryPath); err != nil {
 			return nil, err
 		}
 		products = append(products, p)
@@ -217,7 +216,7 @@ func (r *repositorySQL) GetByCategorySlug(slug string) ([]models.Product, error)
 	var products []models.Product
 	for rows.Next() {
 		var p models.Product
-		if err := rows.Scan(&p.Id, &p.Title, &p.Description, &p.CreatedAt, &p.Updated, &p.Price, &p.Path, &p.CategoryId, &p.Stock, &p.CategoryPath); err != nil {
+		if err := rows.Scan(&p.Id, &p.Name, &p.Description, &p.CreatedAt, &p.Updated, &p.Price, &p.Path, &p.CategoryId, &p.Stock, &p.CategoryPath); err != nil {
 			return nil, err
 		}
 		products = append(products, p)
@@ -228,13 +227,13 @@ func (r *repositorySQL) GetByCategorySlug(slug string) ([]models.Product, error)
 
 func (r *repositorySQL) SearchByText(search string, offset, limit int, sortBy, order string) ([]models.Product, error) {
 	allowedSorts := map[string]string{
-		"id":          "Prod_Id",
-		"title":       "Prod_Title",
-		"description": "Prod_Description",
-		"price":       "Prod_Price",
-		"category_id": "Prod_CategoryId",
-		"stock":       "Prod_Stock",
-		"created_at":  "Prod_CreatedAt",
+		"id":          "products.Prod_Id",
+		"title":       "products.Prod_Title",
+		"description": "products.Prod_Description",
+		"price":       "products.Prod_Price",
+		"category_id": "products.Prod_CategoryId",
+		"stock":       "products.Prod_Stock",
+		"created_at":  "products.Prod_CreatedAt",
 	}
 	dbSortBy, ok := allowedSorts[sortBy]
 	if !ok {
@@ -268,7 +267,7 @@ func (r *repositorySQL) SearchByText(search string, offset, limit int, sortBy, o
 	var products []models.Product
 	for rows.Next() {
 		var p models.Product
-		if err := rows.Scan(&p.Id, &p.Title, &p.Description, &p.CreatedAt, &p.Updated, &p.Price, &p.Path, &p.CategoryId, &p.Stock, &p.CategoryPath); err != nil {
+		if err := rows.Scan(&p.Id, &p.Name, &p.Description, &p.CreatedAt, &p.Updated, &p.Price, &p.Path, &p.CategoryId, &p.Stock, &p.CategoryPath); err != nil {
 			return nil, err
 		}
 		products = append(products, p)
@@ -279,13 +278,13 @@ func (r *repositorySQL) SearchByText(search string, offset, limit int, sortBy, o
 
 func (r *repositorySQL) GetAll(offset, limit int, sortBy, order string) ([]models.Product, error) {
 	allowedSorts := map[string]string{
-		"id":          "p.Prod_Id",
-		"title":       "p.Prod_Title",
-		"description": "p.Prod_Description",
-		"price":       "p.Prod_Price",
-		"category_id": "p.Prod_CategoryId",
-		"stock":       "p.Prod_Stock",
-		"created_at":  "p.Prod_CreatedAt",
+		"id":          "products.Prod_Id",
+		"title":       "products.Prod_Title",
+		"description": "products.Prod_Description",
+		"price":       "products.Prod_Price",
+		"category_id": "products.Prod_CategoryId",
+		"stock":       "products.Prod_Stock",
+		"created_at":  "products.Prod_CreatedAt",
 	}
 
 	dbSortBy, ok := allowedSorts[sortBy]
@@ -316,7 +315,7 @@ func (r *repositorySQL) GetAll(offset, limit int, sortBy, order string) ([]model
 	var products []models.Product
 	for rows.Next() {
 		var p models.Product
-		if err := rows.Scan(&p.Id, &p.Title, &p.Description, &p.CreatedAt, &p.Updated, &p.Price, &p.Path, &p.CategoryId, &p.Stock, &p.CategoryPath); err != nil {
+		if err := rows.Scan(&p.Id, &p.Name, &p.Description, &p.CreatedAt, &p.Updated, &p.Price, &p.Path, &p.CategoryId, &p.Stock, &p.CategoryPath); err != nil {
 			return nil, err
 		}
 		products = append(products, p)
