@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/auth"
 	"github.com/lubualo/ecommerce-go/authctx"
+	adminusers "github.com/lubualo/ecommerce-go/internal/admin/users"
 	"github.com/lubualo/ecommerce-go/internal/category"
 	"github.com/lubualo/ecommerce-go/internal/product"
 	"github.com/lubualo/ecommerce-go/internal/stock"
@@ -30,16 +31,16 @@ func Router(request events.APIGatewayV2HTTPRequest, urlPrefix string, db *sql.DB
 	method := request.RequestContext.HTTP.Method
 	header := request.Headers
 
-	firstSegment := getFirstPathSegment(path)
+	segments := getPathSegments(path)
 
-	entityRouter, err := CreateRouter(firstSegment, db)
+	entityRouter, err := CreateRouter(segments, db)
 	if err != nil {
 		return tools.CreateApiResponse(http.StatusBadRequest, "Unable to route request: "+err.Error())
 	}
 
 	var authUser *models.AuthUser
 
-	if !(path == "product" && method == "GET") && !(path == "category" && method == "GET") {
+	if !(segments[0] == "product" && method == "GET") && !(segments[0] == "category" && method == "GET") {
 		authUser, err = auth.ExtractAuthUser(header)
 		if err != nil {
 			return tools.CreateApiResponse(http.StatusUnauthorized, "Unable to authenticate user: "+err.Error())
@@ -63,26 +64,30 @@ func Router(request events.APIGatewayV2HTTPRequest, urlPrefix string, db *sql.DB
 	}
 }
 
-func CreateRouter(entity string, db *sql.DB) (EntityRouter, error) {
-	switch entity {
+func CreateRouter(segments []string, db *sql.DB) (EntityRouter, error) {
+	switch segments[0] {
 	case "category":
 		return category.NewRouter(db), nil
 	case "product":
 		return product.NewRouter(db), nil
 	case "stock":
 		return stock.NewRouter(db), nil
+	case "admin":
+		if segments[1] == "users" {
+			return adminusers.NewRouter(db), nil	
+		}
+		return nil, fmt.Errorf("path '%s'/'%s' not implemented", segments[0], segments[1])
 	case "user":
 		return user.NewRouter(db), nil
 	default:
-		return nil, fmt.Errorf("entity '%s' not implemented", entity)
+		return nil, fmt.Errorf("path '%s' not implemented", segments[0])
 	}
 }
 
-func getFirstPathSegment(path string) string {
+func getPathSegments(path string) []string {
 	path = strings.Trim(path, "/")
-	parts := strings.Split(path, "/")
-	if len(parts) > 0 {
-		return parts[0]
+	if path == "" {
+		return []string{}
 	}
-	return ""
+	return strings.Split(path, "/")
 }
