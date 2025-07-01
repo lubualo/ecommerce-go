@@ -9,10 +9,11 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/auth"
-	authcontext "github.com/lubualo/ecommerce-go/auth/context"
+	"github.com/lubualo/ecommerce-go/authctx"
 	"github.com/lubualo/ecommerce-go/internal/category"
 	"github.com/lubualo/ecommerce-go/internal/product"
 	"github.com/lubualo/ecommerce-go/internal/stock"
+	"github.com/lubualo/ecommerce-go/internal/user"
 	"github.com/lubualo/ecommerce-go/models"
 	"github.com/lubualo/ecommerce-go/tools"
 )
@@ -45,7 +46,7 @@ func Router(request events.APIGatewayV2HTTPRequest, urlPrefix string, db *sql.DB
 		}
 	}
 
-	context := authcontext.WithUser(context.Background(), authUser)
+	context := authctx.WithUser(context.Background(), authUser)
     requestWithContext := models.NewRequestWithContext(request, context)
 
 	switch method {
@@ -70,6 +71,8 @@ func CreateRouter(entity string, db *sql.DB) (EntityRouter, error) {
 		return product.NewRouter(db), nil
 	case "stock":
 		return stock.NewRouter(db), nil
+	case "user":
+		return user.NewRouter(db), nil
 	default:
 		return nil, fmt.Errorf("entity '%s' not implemented", entity)
 	}
