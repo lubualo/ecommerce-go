@@ -20,6 +20,8 @@ func NewHandler(service *Service) *Handler {
 }
 
 func (h *Handler) Get(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
+// Verify if the user is admin
+
 	query := requestWithContext.RequestQueryStringParameters()
 	page, limit, sortBy, order, err := tools.ParsePaginationAndSorting(query)
 	if err != nil {
@@ -38,6 +40,8 @@ func (h *Handler) Get(requestWithContext models.RequestWithContext) *events.APIG
 }
 
 func (h *Handler) Delete(requestWithContext models.RequestWithContext) *events.APIGatewayProxyResponse {
+// Verify if the user is admin
+
 	uuid := requestWithContext.RequestPathParameters()["id"]
 	if uuid == "" {
 		return tools.CreateApiResponse(http.StatusBadRequest, "invalid UUID")

@@ -46,6 +46,7 @@ func ParsePaginationAndSorting(query map[string]string) (page, limit int, sortBy
 	}
 
 	if val := strings.TrimSpace(query["sort_by"]); val != "" {
+		// no funciona users
 		allowed := map[string]bool{
 			"id": true, "title": true, "description": true, "price": true,
 			"category_id": true, "stock": true, "created_at": true,

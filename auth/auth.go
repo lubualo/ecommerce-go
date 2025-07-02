@@ -1,4 +1,3 @@
-// auth/auth_validation.go
 package auth
 
 import (

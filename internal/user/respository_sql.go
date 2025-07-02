@@ -44,21 +44,6 @@ func (r *repositorySQL) Update(u models.User) error {
 	return nil
 }
 
-func (r *repositorySQL) Delete(id int) error {
-	query, args, err := squirrel.
-		Delete("products").
-		Where(squirrel.Eq{"Prod_Id": id}).
-		ToSql()
-	if err != nil {
-		return err
-	}
-	_, err = r.db.Exec(query, args...)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (r *repositorySQL) GetByUUID(uuid string) (models.User, error) {
 	query, args, err := squirrel.
 		Select("*").

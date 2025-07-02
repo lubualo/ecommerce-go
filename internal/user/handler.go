@@ -29,7 +29,10 @@ func (h *Handler) Put(requestWithContext models.RequestWithContext) *events.APIG
 		return tools.CreateApiResponse(http.StatusBadRequest, "invalid JSON body: "+err.Error())
 	}
 
-	u.UUID = requestWithContext.RequestPathParameters()["id"]
+	u.UUID, err = authctx.UserUUIDFromContext(requestWithContext.Context())
+	if err != nil {
+		return tools.CreateApiResponse(http.StatusUnauthorized, "user not found in context")
+	}
 	err = h.service.Update(u)
 	if err != nil {
 		return tools.CreateApiResponse(http.StatusBadRequest, "error: "+err.Error())
