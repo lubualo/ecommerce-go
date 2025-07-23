@@ -21,14 +21,6 @@ func (s *Service) Update(u models.User) error {
 	return s.repo.Update(u)
 }
 
-func (s *Service) Delete(id int) error {
-	if id < 1 {
-		return ErrInvalidId
-	}
-
-	return s.repo.Delete(id)
-}
-
 func (s *Service) GetByUUID(uuid string) (models.User, error) {
 	if uuid == "" {
 		return models.User{}, ErrInvalidId

@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/lubualo/ecommerce-go/auth"
 	"github.com/lubualo/ecommerce-go/authctx"
+	"github.com/lubualo/ecommerce-go/internal/address"
 	adminusers "github.com/lubualo/ecommerce-go/internal/admin/users"
 	"github.com/lubualo/ecommerce-go/internal/category"
 	"github.com/lubualo/ecommerce-go/internal/product"
@@ -72,6 +73,8 @@ func CreateRouter(segments []string, db *sql.DB) (EntityRouter, error) {
 		return product.NewRouter(db), nil
 	case "stock":
 		return stock.NewRouter(db), nil
+	case "address":
+		return address.NewRouter(db), nil
 	case "admin":
 		if segments[1] == "users" {
 			return adminusers.NewRouter(db), nil	
