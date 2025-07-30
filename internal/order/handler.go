@@ -49,8 +49,8 @@ func (h *Handler) Get(requestWithContext models.RequestWithContext) *events.APIG
 	if err != nil {
 		return tools.CreateApiResponse(http.StatusUnauthorized, "user not found in context")
 	}
-		query := requestWithContext.RequestQueryStringParameters()
-	
+	query := requestWithContext.RequestQueryStringParameters()
+
 	// === 1. Lookup by ID ===
 	if idStr := query["id"]; idStr != "" {
 		id, err := strconv.Atoi(idStr)
@@ -98,5 +98,3 @@ func (h *Handler) Get(requestWithContext models.RequestWithContext) *events.APIG
 	}
 	return tools.CreateApiResponse(http.StatusOK, string(body))
 }
-
-

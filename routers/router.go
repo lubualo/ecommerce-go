@@ -13,6 +13,7 @@ import (
 	"github.com/lubualo/ecommerce-go/internal/address"
 	adminusers "github.com/lubualo/ecommerce-go/internal/admin/users"
 	"github.com/lubualo/ecommerce-go/internal/category"
+	"github.com/lubualo/ecommerce-go/internal/order"
 	"github.com/lubualo/ecommerce-go/internal/product"
 	"github.com/lubualo/ecommerce-go/internal/stock"
 	"github.com/lubualo/ecommerce-go/internal/user"
@@ -49,7 +50,7 @@ func Router(request events.APIGatewayV2HTTPRequest, urlPrefix string, db *sql.DB
 	}
 
 	context := authctx.WithUser(context.Background(), authUser)
-    requestWithContext := models.NewRequestWithContext(request, context)
+	requestWithContext := models.NewRequestWithContext(request, context)
 
 	switch method {
 	case GET:
@@ -75,9 +76,11 @@ func CreateRouter(segments []string, db *sql.DB) (EntityRouter, error) {
 		return stock.NewRouter(db), nil
 	case "address":
 		return address.NewRouter(db), nil
+	case "order":
+		return order.NewRouter(db), nil
 	case "admin":
 		if segments[1] == "users" {
-			return adminusers.NewRouter(db), nil	
+			return adminusers.NewRouter(db), nil
 		}
 		return nil, fmt.Errorf("path '%s'/'%s' not implemented", segments[0], segments[1])
 	case "user":

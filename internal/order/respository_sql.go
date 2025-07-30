@@ -21,7 +21,7 @@ func (r *repositorySQL) Insert(o models.Order) (int64, error) {
 
 	columns = append(columns, "Order_UserUUID")
 	values = append(values, o.UserUUID)
-	columns = append(columns, "Order_AddressId")
+	columns = append(columns, "Order_AddId")
 	values = append(values, o.AddressId)
 	columns = append(columns, "Order_Total")
 	values = append(values, o.Total)
@@ -65,7 +65,7 @@ func (r *repositorySQL) Insert(o models.Order) (int64, error) {
 
 func (r *repositorySQL) GetById(id int) (models.Order, error) {
 	query, args, err := squirrel.
-		Select("Order_Id", "Order_UserUUID", "Order_AddressId", "Order_Total").
+		Select("Order_Id", "Order_UserUUID", "Order_AddId", "Order_Total").
 		From("orders").
 		Where(squirrel.Eq{"Order_Id": id}).
 		PlaceholderFormat(squirrel.Question).
@@ -116,7 +116,7 @@ func (r *repositorySQL) GetAllByUserUUID(userUUID string, offset, limit int, fro
 	var orders []models.Order
 
 	queryBuilder := squirrel.
-		Select("Order_Id", "Order_UserUUID", "Order_AddressId", "Order_Total", "Order_Date").
+		Select("Order_Id", "Order_UserUUID", "Order_AddId", "Order_Total", "Order_Date").
 		From("orders").
 		Where(squirrel.Eq{"Order_UserUUID": userUUID}).
 		PlaceholderFormat(squirrel.Question)
